@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Policy;
 using APSIM.Shared.Documentation;
 using Models.Core;
+using Models.PMF.Phen;
 
 namespace Models.Functions
 {
@@ -11,7 +12,8 @@ namespace Models.Functions
     [Description("Returns the reduction factor on coleoptile length")]
     [ViewName("UserInterface.Views.PropertyView")]
     [PresenterName("UserInterface.Presenters.PropertyPresenter")]
-    public class DwarfingGeneResponse : Model, IFunction
+    [ValidParent(ParentType = typeof(EmergingPhaseColeoptile))]
+    public class DwarfingGeneResponse : Model
     {
         /// <summary>Dwarfing Genes options</summary>
         public enum DwarfingGenesOption
@@ -35,13 +37,14 @@ namespace Models.Functions
         public DwarfingGenesOption DwarfingGeneType { get; set; }
 
         ///<summary>The reduction factor</summary>
-        public double ReductionFactor { get; private set; }
+        public double ColeoptileReductionFactor { get; set; }
 
         /// <summary>Gets the coleoptile length reduction factor based on the selected dwarfing gene type.</summary>
-        public double Value(int arrayIndex = -1)
+        [EventSubscribe("Sowing")]
+        private void OnSowing(object sender, EventArgs e)
         {
             // Set the ReductionFactor property based on the selected dwarfing gene type
-            ReductionFactor = DwarfingGeneType switch
+            ColeoptileReductionFactor = DwarfingGeneType switch
             {
                 DwarfingGenesOption.rht => 1,
                 DwarfingGenesOption.Rht8 => 1,
@@ -51,16 +54,6 @@ namespace Models.Functions
                 DwarfingGenesOption.Rht1Rht2 => 0.5,
                 _ => throw new ArgumentException($"Unsupported genetic type: {DwarfingGeneType}")
             };
-
-            return ReductionFactor;
-        }
-
-        /// <summary>
-        /// Document the model.
-        /// </summary>
-        public override IEnumerable<ITag> Document()
-        {
-            yield return new Paragraph($"*{Name} is a function of coleoptile reduction factor determined by dwarfing genes.");
         }
 
     }

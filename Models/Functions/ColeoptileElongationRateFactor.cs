@@ -38,10 +38,12 @@ namespace Models.Functions
 
         ///<summary>Critical Bulk Density for coleoptile growth</summary>
         [Description("Soil bulk density above this value will limit coleoptile growth")]
+        [Units("g/cm3")]
         public double CriticalBDColeoptile { get; set; } = 1.5;
 
         ///<summary>Critical Bulk Density for coleoptile growth</summary>
         [Description("Soil bulk density above this value will stop coleoptile growth")]
+        [Units("g/cm3")]
         public double MaxBDColeoptile { get; set; } = 2.65;
 
         ///<summary>Soil temperature of the layer where the coleoptile tip grow in</summary>

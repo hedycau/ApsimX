@@ -22,7 +22,7 @@ namespace Models.Functions
 
         /// <summary>Maximum Coleoptile growth rate </summary>
         [Units("mm/oCd")]
-        [Description("Maximum coleoptile growth rate (oCd/mm)")]
+        [Description("Maximum coleoptile growth rate (mm/oCd)")]
         public double MaxColeoptileGrowthRate { get; set; }
 
         /// <summary>Coleoptile growth lag phase </summary>

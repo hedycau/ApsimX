@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using APSIM.Shared.Documentation;
-using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Models.Core;
 using Models.Functions;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using Models.PMF;
+
 
 
 namespace Models.PMF.Phen
@@ -65,7 +65,7 @@ namespace Models.PMF.Phen
 
         /// <summary>Fraction of phase that is complete (0-1).</summary>
         [JsonIgnore]
-        public double FractionComplete { get { return 0; } }
+        public double FractionComplete { get; set; }
 
         //parameters used in calculation, can be set private later
         /// <summary>Delta coleoptile length </summary>
@@ -84,8 +84,11 @@ namespace Models.PMF.Phen
         [Units("mm/oCd")]
         public double ColeoptileGrowthRate { get; set; }
 
-        /// <summary>Accumulate TT for this phase</summary>
-        private double AccumTTthisPhase { get; set; }
+        /// <summary>Accumulate air TT for this phase</summary>
+        private double AccumAirTTthisPhase { get; set; }
+        
+        /// <summary>Accumulate soil TT for this phase</summary>
+        private double AccumSoilTTthisPhase { get; set; }
 
         /// <summary>The index to calculate the first day completeing lag phase</summary>
         public double Lagphasecompleteday { get; set; }
@@ -102,8 +105,9 @@ namespace Models.PMF.Phen
         {
             
             bool proceedToNextPhase = false;
+            ActualMaxLength = EmergingColeoptileParameter.MaxColeoptileLength * DwarfingGeneResponse.ColeoptileReductionFactor;
 
-            if (AccumTTthisPhase >= EmergingColeoptileParameter.ColeoptileLagphase)
+            if (AccumSoilTTthisPhase >= EmergingColeoptileParameter.ColeoptileLagphase)
             {
                 Lagphasecompleteday += 1;
                 
@@ -111,35 +115,49 @@ namespace Models.PMF.Phen
 
                 if (Lagphasecompleteday == 1)
                 {
-                    DeltaColeoptileLength = (AccumTTthisPhase - EmergingColeoptileParameter.ColeoptileLagphase + SoilThermalTime.Value()) / ColeoptileGrowthRate;
+                    DeltaColeoptileLength = (AccumSoilTTthisPhase - EmergingColeoptileParameter.ColeoptileLagphase + SoilThermalTime.Value()) * ColeoptileGrowthRate;
                     //Plant.Phenology.thermalTime.Value()
                 }
                 else
                 {
-                    DeltaColeoptileLength = SoilThermalTime.Value()/ ColeoptileGrowthRate;
+                    DeltaColeoptileLength = SoilThermalTime.Value() * ColeoptileGrowthRate;
                     //ColeoptileElongationRateFactor.SoilTemperatureColeoptileTip / ColeoptileGrowthRate;
                     //Plant.Phenology.thermalTime.Value()
                 }
                 ColeoptileLength = ColeoptileLength + DeltaColeoptileLength;
+                ColeoptileLength = Math.Min(Math.Min(ColeoptileLength, Plant.SowingData.Depth), ActualMaxLength);
             }
 
-            ActualMaxLength = Math.Min(Plant.SowingData.Depth, EmergingColeoptileParameter.MaxColeoptileLength * DwarfingGeneResponse.ColeoptileReductionFactor);
-            AccumTTthisPhase = AccumTTthisPhase + ColeoptileElongationRateFactor.SoilTemperatureColeoptileTip;//Plant.Phenology.thermalTime.Value()
 
-            if (ColeoptileLength >= ActualMaxLength) 
+            AccumSoilTTthisPhase = AccumSoilTTthisPhase + ColeoptileElongationRateFactor.SoilTemperatureColeoptileTip;//Plant.Phenology.thermalTime.Value()
+            AccumAirTTthisPhase = AccumAirTTthisPhase + Plant.Phenology.thermalTime.Value();
+
+            if (Plant.SowingData.Depth <= ActualMaxLength)
+             {
+                if (ColeoptileLength >= Plant.SowingData.Depth)
                 {
-                proceedToNextPhase = true;
+                    proceedToNextPhase = true;
                 }
-            else if (AccumTTthisPhase >= MaxGrowthDuration.Value())
-               {
-                proceedToNextPhase = true;
-               }
-            else
-                proceedToNextPhase = false;
+                else if (AccumAirTTthisPhase >= MaxGrowthDuration.Value())
+                {
+                    proceedToNextPhase = true;
+                }
+                else
+                    proceedToNextPhase = false;
+             }
+            
+            if (Plant.SowingData.Depth > ActualMaxLength)
+            {
+                if (AccumAirTTthisPhase >= MaxGrowthDuration.Value())
+                {
+                    proceedToNextPhase = true;
+                }
+                else
+                    proceedToNextPhase = false;
 
+            }
             return proceedToNextPhase;
         }
-
         /// <summary>Reset phase</summary>
         public void ResetPhase()
         {
@@ -147,11 +165,21 @@ namespace Models.PMF.Phen
             ColeoptileLength = 0;
             ActualMaxLength = 0;
             ColeoptileGrowthRate = 0;
-            AccumTTthisPhase = 0;
+            AccumAirTTthisPhase = 0;
+            AccumSoilTTthisPhase = 0;
             Lagphasecompleteday = 0;
         }
+
+
         //4 Private method
         //-----------------------------------------------------------------------------------------------------------------
+        /// <summary>Called when [simulation commencing].</summary>
+        [EventSubscribe("Commencing")]
+        private void OnSimulationCommencing(object sender, EventArgs e)
+        {
+            ResetPhase();
+        }
+
         /// <summary>Reset Plant density according to sowing depth and coleoptile length </summary>
         [EventSubscribe("DoDailyInitialisation")]
         private void OnDoDailyInitialisation(object sender, EventArgs e)
@@ -176,16 +204,16 @@ namespace Models.PMF.Phen
                 Plant.SowingData.Population = Plant.SowingData.Population * probEmergence;
             }
         }
+
+
         /// <summary>
         /// Document the model.
         /// </summary>
         public override IEnumerable<ITag> Document()
         {
-            // Write description of this class.
-            StringBuilder text = new StringBuilder($"This phase goes from {Start} to {End}. ");
-            text.Append("The phase ends when coleoptile length has reaches its possible max lenght, either the max coleoptile length or sowing depth, or growht duration reaches one phyllochron. ");
-            yield return new APSIM.Shared.Documentation.Paragraph(text.ToString());
+            yield return new Paragraph($"The {Name} phase goes from the {Start} stage to the {End} stage and reaches {End} when coleoptile length has reaches its possible max lenght, either the max coleoptile length or sowing depth, or growht duration reaches one phyllochron.");
         }
+  
 
 
     }

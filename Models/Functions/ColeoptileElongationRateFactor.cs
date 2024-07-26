@@ -101,7 +101,8 @@ namespace Models.Functions
                 ColeoptileGrowthRateFBulkDensity = Math.Min(Math.Max(ColeoptileGrowthRateFBulkDensity, 0), 1);
 
                 //Calculate actual elongation rate
-                ColeoptileGrowthRateReductionFactor = Math.Min(Math.Max(ColeoptileGrowthRateFBulkDensity * ColeoptileGrowthRateFW, 0),1);
+                ColeoptileGrowthRateReductionFactor = ColeoptileGrowthRateFBulkDensity * ColeoptileGrowthRateFW;
+                ColeoptileGrowthRateReductionFactor = Math.Min(Math.Max(ColeoptileGrowthRateReductionFactor, 0),1);
 
             }
         }

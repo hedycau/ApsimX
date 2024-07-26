@@ -17,7 +17,7 @@ namespace Models.Functions
 
     public class GerminatingWaterResponse : Model//, IFunction
     {
-        //[Link] Plant Plant = null;
+        [Link] Plant Plant = null;
         //[Link] GerminatingPhaseSoil GerminatingPhaseSoil = null;
         [Link] private IPhysical SoilPhysical = null;
         [Link] private ISoilWater WaterBalance = null;
@@ -37,7 +37,7 @@ namespace Models.Functions
         [EventSubscribe("StartOfDay")]
         private void OnStartOfDay(object sender, EventArgs e)
         {
-            int i = SoilUtilities.LayerIndexOfDepth(SoilPhysical.Thickness, 20);// Plant.SowingData.Depth);
+            int i = SoilUtilities.LayerIndexOfDepth(SoilPhysical.Thickness, Plant.SowingData.Depth);
 
             if (WaterBalance.SWmm[i] < SoilPhysical.LL15mm[i]) //SoilPhysical.LL15mm[i]
              {
@@ -49,7 +49,7 @@ namespace Models.Functions
              }
             else
              {
-               GerminationDurationFW = (1 - 0.5) * (WaterBalance.SWmm[i] - SoilPhysical.LL15mm[i]) / (SoilPhysical.DULmm[i] - SoilPhysical.LL15mm[i]);
+               GerminationDurationFW = (1 - 0.5) * (WaterBalance.SWmm[i] - SoilPhysical.LL15mm[i]) / (SoilPhysical.DULmm[i] - SoilPhysical.LL15mm[i]) + 0.5;
              }
         }
    //     /// <summary>

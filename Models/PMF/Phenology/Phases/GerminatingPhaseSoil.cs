@@ -42,6 +42,9 @@ namespace Models.PMF.Phen
         //2. Public properties
         //-----------------------------------------------------------------------------------------------------------------
 
+        /// <summary>Occurs when a plant is about to be sown.</summary>
+        public event EventHandler SeedImbibed;
+
         /// <summary>The phenological stage at the start of this phase.</summary>
         [Description("Start")]
         public string Start { get; set; }
@@ -106,6 +109,7 @@ namespace Models.PMF.Phen
             if (AccumTargetTT >= GerminatingParameter.GerminationTarget)
             {
                 proceedToNextPhase = true;
+                doGermination(ref proceedToNextPhase, ref propOfDayToUse);
             }
             else
                 proceedToNextPhase = false;
@@ -120,7 +124,16 @@ namespace Models.PMF.Phen
             AccumTargetTT = 0;
             Dormancyphasecompleteday = 0;
         }
+        // 4. Private methods
+        //-----------------------------------------------------------------------------------------------------------------
 
+        private void doGermination(ref bool proceedToNextPhase, ref double propOfDayToUse)
+        {
+            if (SeedImbibed != null)
+                SeedImbibed.Invoke(this, new EventArgs());
+            proceedToNextPhase = true;
+            propOfDayToUse = 1;
+        }
         /// <summary>
         /// Document the model.
         /// </summary>

@@ -8,8 +8,7 @@ using Models.Functions;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using Models.PMF;
-
-
+using System.Security.Cryptography.Xml;
 
 namespace Models.PMF.Phen
 {
@@ -95,7 +94,20 @@ namespace Models.PMF.Phen
 
         /// <summary>Emergence probability calcualted on the ratio of sowing depth to coleoptile depth</summary>
         public double probEmergence { get; private set; }
-        
+
+        //parameters used in leaf underground grow calculation, can be set private later
+        /// <summary>Delta first leaf length </summary>
+        [Units("mm")]
+        public double DeltaLeafLength { get; set; }
+
+        /// <summary>Actual shoot length (coleoptile + first leaf) </summary>
+        [Units("mm")]
+        public double TotalShootLength { get; set; }
+
+        /// <summary>Actual shoot length (coleoptile + first leaf) </summary>
+        [Units("mm/oCd")]
+        public double FirstLeafGrowthRate { get; set; }
+
 
         //3. Public method
         //-----------------------------------------------------------------------------------------------------------------
@@ -105,27 +117,36 @@ namespace Models.PMF.Phen
         {
             
             bool proceedToNextPhase = false;
-            ActualMaxLength = EmergingColeoptileParameter.MaxColeoptileLength * DwarfingGeneResponse.ColeoptileReductionFactor;
+            ActualMaxLength = EmergingColeoptileParameter.MaxColeoptileLength * DwarfingGeneResponse.ColeoptileReductionFactor + EmergingColeoptileParameter.FirstLeafLength/2;
+            FirstLeafGrowthRate = EmergingColeoptileParameter.FirstLeafLength / MaxGrowthDuration.Value();
 
-            if (AccumSoilTTthisPhase >= EmergingColeoptileParameter.ColeoptileLagphase)
+            if (AccumSoilTTthisPhase >= EmergingColeoptileParameter.ColeoptileLagphase)                
             {
-                Lagphasecompleteday += 1;
-                
-                ColeoptileGrowthRate = EmergingColeoptileParameter.MaxColeoptileGrowthRate * ColeoptileElongationRateFactor.ColeoptileGrowthRateReductionFactor;
+                if (AccumSoilTTthisPhase <= MaxGrowthDuration.Value())
+                {
+                    Lagphasecompleteday += 1;
 
-                if (Lagphasecompleteday == 1)
+                    ColeoptileGrowthRate = EmergingColeoptileParameter.MaxColeoptileGrowthRate * ColeoptileElongationRateFactor.ColeoptileGrowthRateReductionFactor;
+
+                    if (Lagphasecompleteday == 1)
+                    {
+                        DeltaColeoptileLength = (AccumSoilTTthisPhase - EmergingColeoptileParameter.ColeoptileLagphase + SoilThermalTime.Value()) * ColeoptileGrowthRate;
+                        //Plant.Phenology.thermalTime.Value()
+                    }
+                    else
+                    {
+                        DeltaColeoptileLength = SoilThermalTime.Value() * ColeoptileGrowthRate;
+                        //ColeoptileElongationRateFactor.SoilTemperatureColeoptileTip / ColeoptileGrowthRate;
+                        //Plant.Phenology.thermalTime.Value()
+                    }
+                    ColeoptileLength = ColeoptileLength + DeltaColeoptileLength;
+                    
+                } else if (AccumSoilTTthisPhase > MaxGrowthDuration.Value())
                 {
-                    DeltaColeoptileLength = (AccumSoilTTthisPhase - EmergingColeoptileParameter.ColeoptileLagphase + SoilThermalTime.Value()) * ColeoptileGrowthRate;
-                    //Plant.Phenology.thermalTime.Value()
+                    DeltaLeafLength = FirstLeafGrowthRate * ColeoptileElongationRateFactor.ColeoptileGrowthRateReductionFactor * SoilThermalTime.Value() /2; //assume the leaf is folded
                 }
-                else
-                {
-                    DeltaColeoptileLength = SoilThermalTime.Value() * ColeoptileGrowthRate;
-                    //ColeoptileElongationRateFactor.SoilTemperatureColeoptileTip / ColeoptileGrowthRate;
-                    //Plant.Phenology.thermalTime.Value()
-                }
-                ColeoptileLength = ColeoptileLength + DeltaColeoptileLength;
-                ColeoptileLength = Math.Min(Math.Min(ColeoptileLength, Plant.SowingData.Depth), ActualMaxLength);
+                TotalShootLength = ColeoptileLength + DeltaLeafLength;
+                TotalShootLength = Math.Min(Math.Min(ColeoptileLength, Plant.SowingData.Depth), ActualMaxLength);
             }
 
 
@@ -134,11 +155,11 @@ namespace Models.PMF.Phen
 
             if (Plant.SowingData.Depth <= ActualMaxLength)
              {
-                if (ColeoptileLength >= Plant.SowingData.Depth)
+                if (TotalShootLength >= Plant.SowingData.Depth)
                 {
                     proceedToNextPhase = true;
                 }
-                else if (AccumAirTTthisPhase >= MaxGrowthDuration.Value())
+                else if (AccumAirTTthisPhase >= 2 * MaxGrowthDuration.Value())
                 {
                     proceedToNextPhase = true;
                 }
@@ -148,7 +169,7 @@ namespace Models.PMF.Phen
             
             if (Plant.SowingData.Depth > ActualMaxLength)
             {
-                if (AccumAirTTthisPhase >= MaxGrowthDuration.Value())
+                if (AccumAirTTthisPhase >= 2 * MaxGrowthDuration.Value())
                 {
                     proceedToNextPhase = true;
                 }
@@ -168,6 +189,9 @@ namespace Models.PMF.Phen
             AccumAirTTthisPhase = 0;
             AccumSoilTTthisPhase = 0;
             Lagphasecompleteday = 0;
+            DeltaLeafLength = 0;
+            TotalShootLength = 0;
+            FirstLeafGrowthRate = 0;
         }
 
 

@@ -61,8 +61,9 @@ namespace Models.Functions
             if (ColeoptileTipDepth > 0)
             {
                 //Calculate soil moisture factor
-                int i = SoilUtilities.LayerIndexOfDepth(SoilPhysical.Thickness, ColeoptileTipDepth);
-                SoilTemperatureColeoptileTip = SoilTemperature.Value[i];
+                int j = SoilUtilities.LayerIndexOfDepth(SoilPhysical.Thickness, ColeoptileTipDepth);//soil temp and soil hardness-coleoptile tip layer
+                int i = SoilUtilities.LayerIndexOfDepth(SoilPhysical.Thickness, Plant.SowingData.Depth);//soil moisture-seed layer
+                SoilTemperatureColeoptileTip = SoilTemperature.Value[j];
 
                 if (WaterBalance.SWmm[i] < SoilPhysical.LL15mm[i])                    
                 {

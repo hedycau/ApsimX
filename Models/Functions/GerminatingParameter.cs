@@ -8,20 +8,20 @@ namespace Models.Functions
     /// Germinating parameters.
     /// </summary>
     [Serializable]
-    [Description("Germinationg parameters")]
+    [Description("Germination parameters")]
     [ViewName("UserInterface.Views.PropertyView")]
     [PresenterName("UserInterface.Presenters.PropertyPresenter")]
     [ValidParent(ParentType = typeof(GerminatingPhaseSoil))]
     public class GerminatingParameter : Model
     {
         /// <summary>Dormancy Phase </summary>
-        [Units("mm/oCd")]
-        [Description("Dormancy phase(oCd)")]
+        [Units("oCd")]
+        [Description("Dormancy phase")]
         public double DormancyPhase { get; set; } = 0;
 
         /// <summary>Germination Target </summary>
         [Units("oCd")]
-        [Description("Germination Target (oCd)")]
+        [Description("Germination Target")]
         public double GerminationTarget { get; set; } = 35;
 
     }

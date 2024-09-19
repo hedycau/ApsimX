@@ -7,7 +7,7 @@ using Models.PMF.Phen;
 
 namespace Models.Functions
 {
-    /// <summary>This class calculates the impact of dwarfing genes on coleoptile length.</summary>
+    /// <summary>This class calculates the impact of dwarfing genes on max coleoptile length and max leaf size.</summary>
     [Serializable]
     [Description("Returns the reduction factor on coleoptile length")]
     [ViewName("UserInterface.Views.PropertyView")]
@@ -29,15 +29,18 @@ namespace Models.Functions
             ///<summary>GAI dwarfing gene</summary>
             Rht2,
             ///<summary>Two GAI dwarfing genes</summary>
-            Rht1Rht2
+            Rht1_Rht2
         };
 
         ///<summary>Selected DwarfingGeneType</summary>
         [Description("What dwarfing genes does the genotype have?")]
         public DwarfingGenesOption DwarfingGeneType { get; set; }
 
-        ///<summary>The reduction factor</summary>
+        ///<summary>The reduction factor on coleoptile length</summary>
         public double ColeoptileReductionFactor { get; set; }
+
+        ///<summary>The reduction factor on leaf size</summary>
+        public double LeafSizeReductionFactor { get; set; }
 
         /// <summary>Gets the coleoptile length reduction factor based on the selected dwarfing gene type.</summary>
         [EventSubscribe("Sowing")]
@@ -51,7 +54,18 @@ namespace Models.Functions
                 DwarfingGenesOption.Rht13 => 1,
                 DwarfingGenesOption.Rht1 => 0.75,
                 DwarfingGenesOption.Rht2 => 0.75,
-                DwarfingGenesOption.Rht1Rht2 => 0.5,
+                DwarfingGenesOption.Rht1_Rht2 => 0.5,
+                _ => throw new ArgumentException($"Unsupported genetic type: {DwarfingGeneType}")
+            };
+
+            LeafSizeReductionFactor = DwarfingGeneType switch
+            {
+                DwarfingGenesOption.rht => 1,
+                DwarfingGenesOption.Rht8 => 1,
+                DwarfingGenesOption.Rht13 => 1,
+                DwarfingGenesOption.Rht1 => 0.9,
+                DwarfingGenesOption.Rht2 => 0.9,
+                DwarfingGenesOption.Rht1_Rht2 => 0.8,
                 _ => throw new ArgumentException($"Unsupported genetic type: {DwarfingGeneType}")
             };
         }

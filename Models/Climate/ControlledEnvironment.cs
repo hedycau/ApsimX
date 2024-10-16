@@ -122,6 +122,14 @@ namespace Models.Climate
         public double CO2 { get; set; }
 
         /// <summary>
+        /// Gets or sets the O3 level. If not specified in the weather file the default is 20.
+        /// </summary>
+
+        [Description("O3 concentration of the air")]
+        [Units("ppb")]
+        public double O3 { get; set; }
+
+        /// <summary>
         /// Gets or sets the atmospheric air pressure. If not specified in the weather file the default is 1010 hPa.
         /// </summary>
         [Description("Air Pressure")]

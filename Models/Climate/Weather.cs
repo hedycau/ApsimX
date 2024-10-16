@@ -86,6 +86,12 @@ namespace Models.Climate
         private int co2Index;
 
         /// <summary>
+        /// The index of the O3 column in the weather file, or -1
+        /// if the weather file doesn't contain O3.
+        /// </summary>
+        private int O3Index;
+
+        /// <summary>
         /// The index of the DiffuseFraction column in the weather file
         /// </summary>
         private int DiffuseFractionIndex;
@@ -121,6 +127,13 @@ namespace Models.Climate
         /// </summary>
         [JsonIgnore]
         private double co2Value { get; set; }
+
+        /// <summary>
+        /// Stores the O3 value from either the default 20 or from a column in met file. Public property can then also check
+        /// if this value was supplied by a constant
+        /// </summary>
+        [JsonIgnore]
+        private double O3Value { get; set; }
 
         /// <summary>
         /// Allows to specify a second file which contains constants such as lat, long,
@@ -377,6 +390,25 @@ namespace Models.Climate
         }
 
         /// <summary>
+        /// Gets or sets the O3 level. If not specified in the weather file the default is 20.
+        /// </summary>
+        [JsonIgnore]
+        public double O3
+        {
+            get
+            {
+                if (this.reader == null || this.reader.Constant("O3") == null)
+                    return O3Value;
+                else
+                    return this.reader.ConstantAsDouble("O3");
+            }
+            set
+            {
+                O3Value = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the atmospheric air pressure. If not specified in the weather file the default is 1010 hPa.
         /// </summary>
         [Units("hPa")]
@@ -591,6 +623,7 @@ namespace Models.Climate
             this.vapourPressureIndex = 0;
             this.windIndex = 0;
             this.co2Index = -1;
+            this.O3Index = -1;
             this.DiffuseFractionIndex = 0;
             this.dayLengthIndex = 0;
             if (AirPressure == 0)
@@ -657,6 +690,7 @@ namespace Models.Climate
                 metProps.Add("rain");
                 metProps.Add("wind");
                 metProps.Add("diffr");
+                metProps.Add("O3");
 
                 return this.reader.ToTable(metProps);
             }
@@ -685,6 +719,7 @@ namespace Models.Climate
             this.DiffuseFraction = TodaysMetData.DiffuseFraction;
             this.DayLength = TodaysMetData.DayLength;
             this.CO2 = TodaysMetData.CO2;
+            this.O3 = TodaysMetData.O3;
 
             if (this.PreparingNewWeatherData != null)
                 this.PreparingNewWeatherData.Invoke(this, new EventArgs());
@@ -817,6 +852,11 @@ namespace Models.Climate
             else
                 readMetData.CO2 = Convert.ToDouble(readMetData.Raw[co2Index], CultureInfo.InvariantCulture);
 
+            if (O3Index == -1)
+                readMetData.O3 = 20;
+            else
+                readMetData.O3 = Convert.ToDouble(readMetData.Raw[O3Index], CultureInfo.InvariantCulture);
+
             if (this.DiffuseFractionIndex == -1)
             {
                 // Estimate Diffuse Fraction using the Approach of Bristow and Campbell
@@ -926,6 +966,7 @@ namespace Models.Climate
                     this.DiffuseFractionIndex = StringUtilities.IndexOfCaseInsensitive(this.reader.Headings, "DifFr");
                     this.dayLengthIndex = StringUtilities.IndexOfCaseInsensitive(this.reader.Headings, "DayLength");
                     this.co2Index = StringUtilities.IndexOfCaseInsensitive(reader.Headings, "CO2");
+                    this.O3Index = StringUtilities.IndexOfCaseInsensitive(reader.Headings, "O3");
 
                     if (!string.IsNullOrEmpty(ConstantsFile))
                     {

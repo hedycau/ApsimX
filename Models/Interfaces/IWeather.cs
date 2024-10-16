@@ -43,6 +43,9 @@ namespace Models.Interfaces
         /// <summary> Gets or sets the CO2 level. If not specified in the weather file the default is 350.</summary>
         double CO2 { get; set; }
 
+        /// <summary> Gets or sets the O3 level. If not specified in the weather file the default is 20.</summary>
+        double O3 { get; set; }
+
         /// <summary>Gets or sets the atmospheric air pressure. If not specified in the weather file the default is 1010 hPa.</summary>
         double AirPressure { get; set; }
 
@@ -72,6 +75,8 @@ namespace Models.Interfaces
 
         /// <summary> Gets the time the sun went down. </summary>
         double CalculateSunSet();
+
+
 
 
 
@@ -123,6 +128,9 @@ namespace Models.Interfaces
 
         /// <summary>Daily co2 level.</summary>
         public double CO2 { get; set; }
+
+        /// <summary>Daily O3 level.</summary>
+        public double O3 { get; set; }
 
         /// <summary>
         /// Raw data straight from the met file. This can be used to access

@@ -86,6 +86,12 @@ namespace Models.Climate
         private int co2Index;
 
         /// <summary>
+        /// The index of the O3 column in the weather file, or -1
+        /// if the weather file doesn't contain O3.
+        /// </summary>
+        private int O3Index;
+
+        /// <summary>
         /// The index of the DiffuseFraction column in the weather file
         /// </summary>
         private int DiffuseFractionIndex;
@@ -322,6 +328,11 @@ namespace Models.Climate
         public double CO2 { get; set; }
 
         /// <summary>
+        /// Gets or sets the O3 level. If not specified in the weather file the default is 350.
+        /// </summary>
+        [JsonIgnore]
+        public double O3 { get; set; }
+        /// <summary>
         /// Gets or sets the atmospheric air pressure. If not specified in the weather file the default is 1010 hPa.
         /// </summary>
         [Units("hPa")]
@@ -462,6 +473,8 @@ namespace Models.Climate
             this.dayLengthIndex = 0;
             if (CO2 == 0)
                 this.CO2 = 350;
+            if (O3 == 0)
+                this.O3 = 20;
             if (AirPressure == 0)
                 this.AirPressure = 1010;
             if (DiffuseFraction == 0)
@@ -537,6 +550,8 @@ namespace Models.Climate
             this.DayLength = TodaysMetData.DayLength;
             if (co2Index != -1)
                 CO2 = TodaysMetData.CO2;
+            if (O3Index != -1)
+                O3 = TodaysMetData.O3;
 
             if (this.PreparingNewWeatherData != null)
                 this.PreparingNewWeatherData.Invoke(this, new EventArgs());
@@ -621,6 +636,10 @@ namespace Models.Climate
             if (co2Index != -1)
                 readMetData.CO2 = Convert.ToDouble(readMetData.Raw[co2Index], CultureInfo.InvariantCulture);
 
+            if (O3Index != -1)
+                readMetData.O3 = Convert.ToDouble(readMetData.Raw[O3Index], CultureInfo.InvariantCulture);
+
+
             if (this.DiffuseFractionIndex == -1)
             {
                 // Estimate Diffuse Fraction using the Approach of Bristow and Campbell
@@ -704,6 +723,8 @@ namespace Models.Climate
                     this.DiffuseFractionIndex = StringUtilities.IndexOfCaseInsensitive(this.reader.Headings, "DifFr");
                     this.dayLengthIndex = StringUtilities.IndexOfCaseInsensitive(this.reader.Headings, "DayLength");
                     co2Index = StringUtilities.IndexOfCaseInsensitive(reader.Headings, "CO2");
+                    O3Index = StringUtilities.IndexOfCaseInsensitive(reader.Headings, "O3");
+
 
                     if (!string.IsNullOrEmpty(ConstantsFile))
                     {

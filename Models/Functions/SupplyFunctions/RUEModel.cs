@@ -55,6 +55,10 @@ namespace Models.Functions.SupplyFunctions
         [Units("MJ/m^2/d")]
         public IFunction RadnInt = null;
 
+        /// <summary>The fo3</summary>
+        [Link(Type = LinkType.Child, ByName = true)]
+        [Units("0-1")]
+        public IFunction FO3 = null;
 
         /// <summary>Gets the VPD.</summary>
         /// <value>The VPD.</value>
@@ -77,7 +81,7 @@ namespace Models.Functions.SupplyFunctions
         {
             get
             {
-                return Math.Min(FT.Value(), Math.Min(FN.Value(), FVPD.Value())) * FW.Value() * FCO2.Value();
+                return Math.Min(FT.Value(), Math.Min(FN.Value(), FVPD.Value())) * FW.Value() * FCO2.Value() * FO3.Value();
             }
         }
 

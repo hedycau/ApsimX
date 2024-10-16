@@ -13,6 +13,8 @@
 
         public double CO2 { get; set; }
 
+        public double O3 { get; set; }
+
         public double AirPressure { get; set; }
 
         public double DiffuseFraction { get; set; }

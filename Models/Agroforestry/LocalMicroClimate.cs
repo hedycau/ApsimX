@@ -93,6 +93,12 @@ namespace Models.Agroforestry
         public double CO2 { get { return weather.CO2; } set { weather.CO2 = value; } }
 
         /// <summary>
+        /// Gets or sets the O3 level. If not specified in the weather file the default is 350.
+        /// </summary>
+        [JsonIgnore]
+        public double O3 { get { return weather.O3; } set { weather.O3 = value; } }
+
+        /// <summary>
         /// Gets or sets the atmospheric air pressure. If not specified in the weather file the default is 1010 hPa.
         /// </summary>
         [JsonIgnore]

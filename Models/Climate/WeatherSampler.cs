@@ -160,6 +160,11 @@ namespace Models.Climate
         [JsonIgnore]
         public double CO2 { get; set; }
 
+        /// <summary>o3 level. If not specified in the weather file the default is 20.</summary>
+        [Units("ppb")]
+        [JsonIgnore]
+        public double O3 { get; set; }
+
         /// <summary>Atmospheric air pressure. If not specified in the weather file the default is 1010 hPa.</summary>
         [Units("hPa")]
         [JsonIgnore]
@@ -239,6 +244,10 @@ namespace Models.Climate
                     CO2 = Convert.ToDouble(file.Constant("CO2").Value);
                 else
                     CO2 = 350;
+                if (file.Constant("O3") != null)
+                    O3 = Convert.ToDouble(file.Constant("O3").Value);
+                else
+                    O3 = 20;
             }
             finally
             {

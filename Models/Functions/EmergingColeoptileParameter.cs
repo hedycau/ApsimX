@@ -14,26 +14,31 @@ namespace Models.Functions
     [ValidParent(ParentType = typeof(EmergingPhaseColeoptile))]
     public class EmergingColeoptileParameter : Model
     {
-        
+
         /// <summary>Maximum coleoptile length (mm)</summary>
         [Units("mm")]
         [Description("Maximum coleoptile length (mm)")]
-        public double MaxColeoptileLength { get; set; }
+        public double MaxColeoptileLength { get; set; } = 135;
 
         /// <summary>Maximum Coleoptile growth rate </summary>
         [Units("mm/oCd")]
         [Description("Maximum coleoptile growth rate (mm/oCd)")]
-        public double MaxColeoptileGrowthRate { get; set; }
+        public double MaxColeoptileGrowthRate { get; set; } = 1.5;
 
-        /// <summary>first leaf length</summary>
-        [Units("mm")]
-        [Description("First leaf lenght (mm)")]
-        public double FirstLeafLength { get; set; }
-        
         /// <summary>Coleoptile growth lag phase </summary>
         [Units("oCd")]
         [Description("Coleoptile growth lag phase (oCd)")]
-        public double ColeoptileLagphase { get; set; }
+        public double ColeoptileLagphase { get; set; } = 0;
+
+        /// <summary>first leaf length</summary>
+        [Units("mm")]
+        [Description("First leaf length (mm)")]
+        public double FirstLeafLength { get; set; } = 73.9;
+
+        /// <summary>Seed Weight</summary>
+        [Units("mg")]
+        [Description("Seed Weight(mg)")]
+        public double SeedWeight { get; set; } = 40;
 
     }
 }

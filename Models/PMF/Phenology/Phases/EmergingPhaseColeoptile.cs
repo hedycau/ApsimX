@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using Models.PMF;
 using System.Security.Cryptography.Xml;
+using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace Models.PMF.Phen
 {
@@ -47,6 +48,15 @@ namespace Models.PMF.Phen
         [Link(Type = LinkType.Child, ByName = true)]
         IFunction SoilThermalTime = null;
 
+        //First Leaf Length Rate according to seed weight Zhao et al(2019) JEB
+        [Link(Type = LinkType.Child, ByName = true)]
+        IFunction FirstLeafLengthRate = null;
+
+        //First Leaf Width Rate according to seed weight Zhao et al(2019) JEB
+        [Link(Type = LinkType.Child, ByName = true)]
+        IFunction FirstLeafWidthRate = null;
+        
+
         //2. Public properties
         //-----------------------------------------------------------------------------------------------------------------
 
@@ -75,9 +85,13 @@ namespace Models.PMF.Phen
         [Units("mm")]
         public double ColeoptileLength { get; set; }
 
-        /// <summary>Actual maximum coleoptile length </summary>
+        /// <summary>Actual maximum coleoptile+leaf length </summary>
         [Units("mm")]
         public double ActualMaxLength { get; set; }
+
+        /// <summary>Actual maximum coleoptile length </summary>
+        [Units("mm")]
+        public double ActualMaxColeoptileLength { get; set; }
 
         /// <summary>Actual Coleoptile growth rate </summary>
         [Units("mm/oCd")]
@@ -104,9 +118,13 @@ namespace Models.PMF.Phen
         [Units("mm")]
         public double TotalShootLength { get; set; }
 
-        /// <summary>Actual shoot length (coleoptile + first leaf) </summary>
+        /// <summary>First Leaf Growth Rate </summary>
         [Units("mm/oCd")]
         public double FirstLeafGrowthRate { get; set; }
+
+        /// <summary>First Leaf Width rate - use to define initial leaf area at emergence </summary>
+        [Units("")]
+        public double FirstLeafWidthRateValue { get; set; }
 
 
         //3. Public method
@@ -115,10 +133,11 @@ namespace Models.PMF.Phen
         /// <summary>Do our timestep development</summary>
         public bool DoTimeStep(ref double propOfDayToUse)
         {
-            
+            FirstLeafWidthRateValue = FirstLeafWidthRate.Value();
             bool proceedToNextPhase = false;
             ActualMaxLength = EmergingColeoptileParameter.MaxColeoptileLength * DwarfingGeneResponse.ColeoptileReductionFactor + EmergingColeoptileParameter.FirstLeafLength/2;
-            FirstLeafGrowthRate = EmergingColeoptileParameter.FirstLeafLength / MaxGrowthDuration.Value();
+            ActualMaxColeoptileLength = EmergingColeoptileParameter.MaxColeoptileLength * DwarfingGeneResponse.ColeoptileReductionFactor;
+            FirstLeafGrowthRate = EmergingColeoptileParameter.FirstLeafLength * FirstLeafLengthRate.Value()/ MaxGrowthDuration.Value();
 
             if (AccumSoilTTthisPhase >= EmergingColeoptileParameter.ColeoptileLagphase)                
             {
@@ -146,7 +165,8 @@ namespace Models.PMF.Phen
                     DeltaLeafLength = FirstLeafGrowthRate * ColeoptileElongationRateFactor.ColeoptileGrowthRateReductionFactor * SoilThermalTime.Value() /2; //assume the leaf is folded
                 }
                 TotalShootLength = ColeoptileLength + DeltaLeafLength;
-                TotalShootLength = Math.Min(Math.Min(ColeoptileLength, Plant.SowingData.Depth), ActualMaxLength);
+                TotalShootLength = Math.Min(Math.Min(TotalShootLength, Plant.SowingData.Depth), ActualMaxLength);
+                ColeoptileLength = Math.Min(Math.Min(ColeoptileLength, Plant.SowingData.Depth), ActualMaxColeoptileLength);
             }
 
 

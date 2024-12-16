@@ -6,6 +6,7 @@ using APSIM.Shared.Utilities;
 using Models.Core;
 using Models.Interfaces;
 using Models.PMF.Interfaces;
+using Models.PMF.Phen;
 using Models.PMF.Struct;
 using Newtonsoft.Json;
 using static Models.PMF.Organs.Leaf;
@@ -87,6 +88,10 @@ namespace Models.PMF.Organs
         /// <summary>The live start</summary>
         public Biomass LiveStart = null;
 
+        //First Leaf Width Rate according to seed weight Zhao et al(2019) JEB
+        [Link]
+        private EmergingPhaseColeoptile EmergingPhaseColeoptile = null;
+        
         #endregion
 
         #region Class Fields
@@ -94,6 +99,12 @@ namespace Models.PMF.Organs
         /// <summary>The rank</summary>
         [Description("Rank")]
         public int Rank { get; set; } // 1 based ranking
+
+
+        /// <summary>The impact of early vigour on initial leaf area at emergence</summary>
+        [Description("AreaRateVigour")]
+        [Units("")]
+        public double AreaRateVigour { get; set; } = 1;
 
         /// <summary>The area</summary>
         [Description("Area")]
@@ -781,6 +792,9 @@ namespace Models.PMF.Organs
                 throw new Exception("LeafCohortParameters.StructuralFraction cannot have a value of 1.");
             if (MathUtilities.FloatsAreEqual(StructuralFraction, 0))
                 throw new Exception("LeafCohortParameters.StructuralFraction cannot have a value of 0.");
+
+            //Add early virgour effect and the impact of seed weight on initial leaf area at emergence
+            Area = Area * EmergingPhaseColeoptile.FirstLeafWidthRateValue * AreaRateVigour;
 
             if (Area > 0) //Only set age for cohorts that have an area specified in the xml.
             {

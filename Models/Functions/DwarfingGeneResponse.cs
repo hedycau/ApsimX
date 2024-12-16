@@ -60,12 +60,12 @@ namespace Models.Functions
 
             LeafSizeReductionFactor = DwarfingGeneType switch
             {
-                DwarfingGenesOption.rht => 1,
-                DwarfingGenesOption.Rht8 => 1,
-                DwarfingGenesOption.Rht13 => 1,
-                DwarfingGenesOption.Rht1 => 0.9,
-                DwarfingGenesOption.Rht2 => 0.9,
-                DwarfingGenesOption.Rht1_Rht2 => 0.8,
+                DwarfingGenesOption.rht => 1.25,
+                DwarfingGenesOption.Rht8 => 1.25,
+                DwarfingGenesOption.Rht13 => 1.25,
+                DwarfingGenesOption.Rht1 => 1.0625,
+                DwarfingGenesOption.Rht2 => 1.0625,
+                DwarfingGenesOption.Rht1_Rht2 => 1,
                 _ => throw new ArgumentException($"Unsupported genetic type: {DwarfingGeneType}")
             };
         }

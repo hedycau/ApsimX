@@ -230,6 +230,8 @@ namespace Models.PMF.Phen
         {
             if (Plant.Phenology.CurrentStageName == "Emergence")
             {
+                if (ColeoptileLength < Plant.SowingData.Depth) 
+                { 
                 double belta = Plant.SowingData.Depth / ColeoptileLength;
 
                 if (belta > 2)
@@ -246,6 +248,7 @@ namespace Models.PMF.Phen
                 }
                 Plant.Population = Plant.SowingData.Population * probEmergence;
                 Plant.SowingData.Population = Plant.SowingData.Population * probEmergence;
+                }
             }
         }
 

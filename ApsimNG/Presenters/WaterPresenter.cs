@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using APSIM.Numerics;
 using APSIM.Shared.Graphing;
 using APSIM.Shared.Utilities;
 using Gtk.Sheet;
@@ -62,8 +63,9 @@ namespace UserInterface.Presenters
             ContainerView gridContainer = view.GetControl<ContainerView>("grid");
 
             this.explorerPresenter = explorerPresenter;
+
             gridPresenter = new GridPresenter();
-            gridPresenter.Attach((model as IGridModel).Tables[0], gridContainer, explorerPresenter);
+            gridPresenter.Attach(water, gridContainer, explorerPresenter);
             gridPresenter.AddContextMenuOptions(new string[] { "Cut", "Copy", "Paste", "Delete", "Select All" });
 
             percentFullEdit = view.GetControl<EditView>("percentFullEdit");
@@ -138,10 +140,10 @@ namespace UserInterface.Presenters
         /// <param name="colIndices">The indices of the columns of the cells that were changed.</param>
         /// <param name="rowIndices">The indices of the rows of the cells that were changed.</param>
         /// <param name="values">The cell values.</param>
-        private void OnCellChanged(ISheetDataProvider dataProvider, int[] colIndices, int[] rowIndices, string[] values)
+        private void OnCellChanged(IDataProvider dataProvider, int[] colIndices, int[] rowIndices, string[] values)
         {
 
-            if (water.AreInitialValuesWithinPhysicalBoundaries(water.InitialValues))
+            if (water.AreInitialValuesWithinPhysicalBoundaries())
                 Refresh();
             else
             {
@@ -165,7 +167,7 @@ namespace UserInterface.Presenters
             if (string.IsNullOrEmpty(pawEdit.Text) && Gtk.Application.EventsPending())
                 return;
             if (double.TryParse(pawEdit.Text, out double val) && string.Compare(pawEdit.Text,"-") != 0)
-                ChangePropertyValue(new ChangeProperty(water, "InitialPAWmm", val));                
+                ChangePropertyValue(new ChangeProperty(water, "InitialPAWmm", val));
         }
 
         /// <summary>Invoked when the percent full edit box is changed.</summary>
@@ -252,6 +254,7 @@ namespace UserInterface.Presenters
         /// <param name="changedModel">The model with changes</param>
         private void OnModelChanged(object changedModel)
         {
+            water = changedModel as Water;
             Refresh();
         }
 
@@ -263,34 +266,36 @@ namespace UserInterface.Presenters
             graph.Clear();
 
             //draw the area relative to whatever the water node is currently relative to
+            if (swThickness.Length == thickness.Length)
                 graph.DrawRegion($"PAW relative to {cllName}", cll, swCumulativeThickness,
-                            sw, swCumulativeThickness,
-                            AxisPosition.Top, AxisPosition.Left,
-                            System.Drawing.Color.LightSkyBlue, true);
+                                sw, swCumulativeThickness,
+                                AxisPosition.Top, AxisPosition.Left,
+                                System.Drawing.Color.LightSkyBlue, true);
 
             graph.DrawLineAndMarkers("Airdry", airdry,
-                                     cumulativeThickness,
-                                     "", "", null, null, AxisPosition.Top, AxisPosition.Left,
-                                     System.Drawing.Color.Red, LineType.DashDot, MarkerType.None,
-                                     LineThickness.Normal, MarkerSize.Normal, 1, true);
+                                    cumulativeThickness,
+                                    "", "", null, null, AxisPosition.Top, AxisPosition.Left,
+                                    System.Drawing.Color.Red, LineType.DashDot, MarkerType.None,
+                                    LineThickness.Normal, MarkerSize.Normal, 1, true);
 
-            graph.DrawLineAndMarkers(cllName, cll,
-                                     swCumulativeThickness,
-                                     "", "", null, null, AxisPosition.Top, AxisPosition.Left,
-                                     System.Drawing.Color.Red, LineType.Solid, MarkerType.None,
-                                     LineThickness.Normal, MarkerSize.Normal, 1, true);
+            if (swThickness.Length == thickness.Length)
+                graph.DrawLineAndMarkers(cllName, cll,
+                                        swCumulativeThickness,
+                                        "", "", null, null, AxisPosition.Top, AxisPosition.Left,
+                                        System.Drawing.Color.Red, LineType.Solid, MarkerType.None,
+                                        LineThickness.Normal, MarkerSize.Normal, 1, true);
 
             graph.DrawLineAndMarkers("DUL", dul,
-                         cumulativeThickness,
-                         "", "", null, null, AxisPosition.Top, AxisPosition.Left,
-                         System.Drawing.Color.Blue, LineType.Solid, MarkerType.None,
-                         LineThickness.Normal, MarkerSize.Normal, 1, true);
+                        cumulativeThickness,
+                        "", "", null, null, AxisPosition.Top, AxisPosition.Left,
+                        System.Drawing.Color.Blue, LineType.Solid, MarkerType.None,
+                        LineThickness.Normal, MarkerSize.Normal, 1, true);
 
             graph.DrawLineAndMarkers("SAT", sat,
-                                     cumulativeThickness,
-                                     "", "", null, null, AxisPosition.Top, AxisPosition.Left,
-                                     System.Drawing.Color.Blue, LineType.DashDot, MarkerType.None,
-                                     LineThickness.Normal, MarkerSize.Normal, 1, true);
+                                    cumulativeThickness,
+                                    "", "", null, null, AxisPosition.Top, AxisPosition.Left,
+                                    System.Drawing.Color.Blue, LineType.DashDot, MarkerType.None,
+                                    LineThickness.Normal, MarkerSize.Normal, 1, true);
 
             if (llsoil != null && llsoilsName != null)
             {

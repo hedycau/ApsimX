@@ -35,7 +35,10 @@ namespace Models.Core.ApsimFile
                 parent.Children.Add(modelToAdd);
             }
             else throw new ArgumentException($"A {modelToAdd.GetType().Name} cannot be added to a {parent.GetType().Name}.");
-                       
+
+            //Do error checking on model if it's a Replacements folder
+            Folder.IsModelReplacementsFolder(modelToAdd);
+
             modelToAdd.OnCreated();
 
             foreach (IModel model in modelToAdd.FindAllDescendants().ToList())
@@ -205,7 +208,7 @@ namespace Models.Core.ApsimFile
         /// <summary>Replace one model with another.</summary>
         /// <param name="modelToReplace">The old model to replace.</param>
         /// <param name="replacement">The new model.</param>
-        public static void Replace(IModel modelToReplace, IModel replacement)
+        public static IModel Replace(IModel modelToReplace, IModel replacement)
         {
             IModel newModel = Apsim.Clone(replacement);
             int index = modelToReplace.Parent.Children.IndexOf(modelToReplace as Model);
@@ -234,6 +237,8 @@ namespace Models.Core.ApsimFile
             newModel.OnCreated();
             foreach (var model in newModel.FindAllDescendants().ToList())
                 model.OnCreated();
+                
+            return newModel;
         }
     }
 }

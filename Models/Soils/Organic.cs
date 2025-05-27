@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using APSIM.Numerics;
 using APSIM.Shared.Utilities;
 using Models.Core;
 using Models.Interfaces;
@@ -61,6 +62,7 @@ namespace Models.Soils
         [Summary]
         [Bounds(Lower = 0.1, Upper = 10.0)]
         [Display(Format = "N3")]
+        [Units("%")]
         public double[] Carbon { get; set; }
 
         /// <summary>The units of organic carbon.</summary>

@@ -1,6 +1,6 @@
 ﻿using System;
+using APSIM.Numerics;
 using APSIM.Shared.Utilities;
-using DocumentFormat.OpenXml.Drawing.Charts;
 using Models.Core;
 using Models.Interfaces;
 

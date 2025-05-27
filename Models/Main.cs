@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using APSIM.Shared.JobRunning;
 using APSIM.Shared.Utilities;
 using CommandLine;
@@ -12,8 +13,10 @@ using Models.Core;
 using Models.Core.ApsimFile;
 using Models.Core.ConfigFile;
 using Models.Core.Run;
+using Models.Factorial;
 using Models.Storage;
 using Models.Utilities.Extensions;
+using Newtonsoft.Json.Linq;
 
 namespace Models
 {
@@ -121,6 +124,15 @@ namespace Models
                             Console.WriteLine("Successfully upgraded " + file);
                     }
                 }
+                else if (options.FileVersionNumber)
+                {
+                    if (files.Length > 1)
+                        throw new ArgumentException("The file version number switch cannot be run with more than one file.");
+                    string file = files.First();
+                    JObject simsJObject = JObject.Parse(File.ReadAllText(file));
+                    string fileVersionNumber = JsonUtilities.GetApsimFileVersion(simsJObject);
+                    Console.WriteLine(fileVersionNumber);
+                }
                 else if (options.ListSimulationNames)
                     foreach (string file in files)
                         ListSimulationNames(file, options.SimulationNameRegex);
@@ -171,7 +183,7 @@ namespace Models
                 {
                     string configFileAbsolutePath = Path.GetFullPath(options.Apply);
                     string configFileDirectory = Directory.GetParent(configFileAbsolutePath).FullName;
-                    List<string> commandsList = ParseConfigFileCommands(options);
+                    List<string> commandsList = ConfigFile.GetConfigFileCommands(options.Apply);
                     DoCommands(options, files, configFileDirectory, commandsList);
                     CleanUpTempFiles(configFileDirectory);
                 }
@@ -235,21 +247,6 @@ namespace Models
                 exitCode = 1;
             }
         }
-
-        /// <summary>
-        /// Parses and configures commands for use in model run.
-        /// </summary>
-        /// <param name="options">Arguments from Models command.</param>
-        /// <returns></returns>
-        private static List<string> ParseConfigFileCommands(Options options)
-        {
-            List<string> commands = ConfigFile.GetConfigFileCommands(options.Apply);
-            List<string> commandsWithoutNulls = ConfigFile.GetListWithoutNullCommands(commands);
-            List<string> commandsWithSpacesRemoved = ConfigFile.RemoveConfigFileWhitespace(commandsWithoutNulls.ToList());
-            return ConfigFile.EncodeSpacesInCommandList(commandsWithSpacesRemoved);
-        }
-
-
 
         /// <summary>
         /// Takes an array of commands and runs them in sequence.
@@ -335,7 +332,6 @@ namespace Models
                     configured_command = ConfigFile.ReplaceBatchFilePlaceholders(command, row, row.Table.Rows.IndexOf(row));
                 else configured_command = command;
 
-                configured_command = ConfigFile.EncodeSpacesInCommandList(new List<string> { configured_command }).First();
                 string[] splitCommand = configured_command.Split(' ', '=');
 
                 ConfigureCommandRun(splitCommand, configFileDirectory, ref applyRunManager);
@@ -404,7 +400,6 @@ namespace Models
                     configured_command = ConfigFile.ReplaceBatchFilePlaceholders(command, row, row.Table.Rows.IndexOf(row));
                 else configured_command = command;
 
-                configured_command = ConfigFile.EncodeSpacesInCommandList(new List<string> { configured_command }).First();
                 string[] splitCommand = configured_command.Split(' ', '=');
                 ConfigureCommandRun(splitCommand, configFileDirectory, ref applyRunManager);
 
@@ -689,13 +684,59 @@ namespace Models
 
             if (showEnabledOnly)
             {
-                List<Simulation> enabledSims = file.FindAllDescendants<Simulation>().Where(sim => sim.Enabled == true).ToList();
-                enabledSims.ForEach(sim => Console.WriteLine(sim.Name));
+                List<string> sims = GetAllSimulationAndFactorialNameList(file, true);
+                sims.ForEach(Console.WriteLine);
             }
             else
             {
-                SimulationGroup jobFinder = new SimulationGroup(file, simulationNamePatternMatch: simulationNameRegex);
-                jobFinder.FindAllSimulationNames(file, null).ForEach(name => Console.WriteLine(name));
+                List<string> sims = GetAllSimulationAndFactorialNameList(file);
+                if (string.IsNullOrEmpty(simulationNameRegex))
+                {
+                    sims.ForEach(Console.WriteLine);
+                }
+                else
+                {
+                    PrintMatchingStrings(simulationNameRegex, sims);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get all sSimulation and Factorial names from the given file.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="onlyEnabled"></param>
+        /// <returns></returns>
+        private static List<string> GetAllSimulationAndFactorialNameList(Simulations file, bool onlyEnabled = false)
+        {
+            List<string> sims = [];
+            if (onlyEnabled)
+            {
+                sims = file.FindAllChildren<Simulation>().Where(sim => sim.Enabled == true).Select(sim => sim.Name).ToList();
+                List<string> allExperimentCombinations = file.FindAllDescendants<Experiment>().SelectMany(experiment => experiment.GetSimulationDescriptions(false).Select(sim => sim.Name)).ToList();
+                sims.AddRange(allExperimentCombinations);
+            }
+            else
+            {
+                sims = file.FindAllChildren<Simulation>().Select(sim => sim.Name).ToList();
+                List<string> allExperimentCombinations = file.FindAllDescendants<Experiment>().SelectMany(experiment => experiment.GetSimulationDescriptions().Select(sim => sim.Name)).ToList();
+                sims.AddRange(allExperimentCombinations);
+            }
+            return sims;
+        }
+
+        /// <summary>
+        /// Print the simulation names that match the given regex.
+        /// </summary>
+        /// <param name="simulationNameRegex"></param>
+        /// <param name="sims"></param>
+        private static void PrintMatchingStrings(string simulationNameRegex, List<string> sims)
+        {
+            Regex r = new Regex(simulationNameRegex);
+            foreach (var sim in sims)
+            {
+                if (r.IsMatch(sim))
+                    Console.WriteLine(sim);
             }
         }
 
@@ -730,9 +771,10 @@ namespace Models
                 string fileName = Path.ChangeExtension(group.FileName, ".db");
                 var storage = new Storage.DataStore(fileName);
                 Report.WriteAllTables(storage, fileName);
-                if (File.Exists(Path.ChangeExtension(fileName, ".csv")))
-                    Console.WriteLine("Successfully created csv file " + Path.ChangeExtension(fileName, ".csv"));
-                else Console.WriteLine("Unable to make csv file for " + Path.ChangeExtension(fileName, ".csv"));
+                string csvFilePattern = $"{Path.GetFileNameWithoutExtension(fileName)}.*.csv";
+                if(Directory.GetFiles(Path.GetDirectoryName(fileName), csvFilePattern).Length > 0)
+                    Console.WriteLine("Successfully created csv file(s) " + fileName);
+                else Console.WriteLine("Unable to make csv file(s) for " + fileName);
             }
         }
 

@@ -53,6 +53,9 @@ namespace Models.Interfaces
         [Units("ppm")]
         double CO2 { get; set; }
 
+        /// <summary> Gets or sets the O3 level. If not specified in the weather file the default is 20.</summary>
+        double O3 { get; set; }
+
         /// <summary>Atmospheric air pressure</summary>
         [Units("hPa")]
         double AirPressure { get; set; }

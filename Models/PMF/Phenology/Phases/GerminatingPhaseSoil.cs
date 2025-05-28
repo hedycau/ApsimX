@@ -134,19 +134,5 @@ namespace Models.PMF.Phen
             proceedToNextPhase = true;
             propOfDayToUse = 1;
         }
-        /// <summary>
-        /// Document the model.
-        /// </summary>
-        public override IEnumerable<ITag> Document()
-        {
-            // Write description of this class.
-            StringBuilder text = new StringBuilder($"This phase goes from {Start} to {End}. ");
-            text.Append("The phase ends when accumulated TT reach TT target for germination");
-            yield return new APSIM.Shared.Documentation.Paragraph(text.ToString());
-        }
-
-
-
-
     }
 }

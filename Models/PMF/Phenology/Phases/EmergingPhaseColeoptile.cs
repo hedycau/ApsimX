@@ -251,21 +251,5 @@ namespace Models.PMF.Phen
                 }
             }
         }
-
-
-        /// <summary>
-        /// Document the model.
-        /// </summary>
-        public override IEnumerable<ITag> Document()
-        {
-            yield return new Paragraph($"The {Name} phase goes from the {Start} stage to the {End} stage and reaches {End} when coleoptile length has reaches its possible max lenght, either the max coleoptile length or sowing depth, or growht duration reaches one phyllochron.");
-        }
-  
-
-
     }
-
-
-
-
 }

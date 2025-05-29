@@ -87,6 +87,30 @@
               "Children": [],
               "Enabled": true,
               "ReadOnly": false
+            },
+            {
+              "$type": "Models.PMF.Cultivar, Models",
+              "Command": [
+                "[Phenology].Phyllochron.BasePhyllochron.FixedValue = 107.48",
+                "[Grain].MaximumPotentialGrainSize.FixedValue = 0.041",
+                "[Grain].NumberFunction.GrainNumber.GrainsPerGramOfStem.FixedValue = 22",
+                "[Phenology].PhyllochronPpSensitivity.FixedValue = 0.247",
+                "[Phenology].CAMP.FLNparams.MinLN = 7",
+                "[Phenology].CAMP.FLNparams.PpLN = 4",
+                "[Phenology].CAMP.FLNparams.VrnLN = 2",
+                "[Phenology].CAMP.FLNparams.VxPLN = 0",
+                "[Phenology].HeadEmergenceLongDayBase.FixedValue = 50",
+                "[Phenology].HeadEmergencePpSensitivity.FixedValue = 5",
+                "[Phenology].CAMP.EnvData.VrnTreatTemp = 6",
+                "[Phenology].CAMP.EnvData.VrnTreatDuration = 60",
+                "",
+                "[Phenology].EmergingPhaseColeoptile.DwarfingGeneResponse.DwarfingGeneType = Rht8"
+              ],
+              "Name": "Hartog",
+              "ResourceName": null,
+              "Children": [],
+              "Enabled": true,
+              "ReadOnly": false
             }
           ],
           "Enabled": true,
@@ -21332,7 +21356,7 @@
           "Name": "Clock",
           "ResourceName": null,
           "Children": [],
-          "Enabled": true,
+          "Enabled": false,
           "ReadOnly": false
         },
         {
@@ -21341,7 +21365,7 @@
           "Name": "Summary",
           "ResourceName": null,
           "Children": [],
-          "Enabled": true,
+          "Enabled": false,
           "ReadOnly": false
         },
         {
@@ -21352,7 +21376,7 @@
           "Name": "Weather",
           "ResourceName": null,
           "Children": [],
-          "Enabled": true,
+          "Enabled": false,
           "ReadOnly": false
         },
         {
@@ -21360,7 +21384,7 @@
           "Name": "SoilArbitrator",
           "ResourceName": null,
           "Children": [],
-          "Enabled": true,
+          "Enabled": false,
           "ReadOnly": false
         },
         {
@@ -21376,7 +21400,7 @@
           "Name": "MicroClimate",
           "ResourceName": "MicroClimate",
           "Children": [],
-          "Enabled": true,
+          "Enabled": false,
           "ReadOnly": false
         },
         {
@@ -21478,7 +21502,7 @@
               "Name": "ReportDaily",
               "ResourceName": null,
               "Children": [],
-              "Enabled": true,
+              "Enabled": false,
               "ReadOnly": false
             },
             {
@@ -21486,7 +21510,7 @@
               "Name": "Fertiliser",
               "ResourceName": "Fertiliser",
               "Children": [],
-              "Enabled": true,
+              "Enabled": false,
               "ReadOnly": false
             },
             {
@@ -21902,7 +21926,7 @@
                       "Name": "WheatSoil",
                       "ResourceName": null,
                       "Children": [],
-                      "Enabled": true,
+                      "Enabled": false,
                       "ReadOnly": false
                     },
                     {
@@ -21994,7 +22018,7 @@
                       "Name": "CottonSoil",
                       "ResourceName": null,
                       "Children": [],
-                      "Enabled": true,
+                      "Enabled": false,
                       "ReadOnly": false
                     },
                     {
@@ -22086,11 +22110,11 @@
                       "Name": "SorghumSoil",
                       "ResourceName": null,
                       "Children": [],
-                      "Enabled": true,
+                      "Enabled": false,
                       "ReadOnly": false
                     }
                   ],
-                  "Enabled": true,
+                  "Enabled": false,
                   "ReadOnly": false
                 },
                 {
@@ -22129,7 +22153,7 @@
                   "Name": "Water",
                   "ResourceName": null,
                   "Children": [],
-                  "Enabled": true,
+                  "Enabled": false,
                   "ReadOnly": false
                 },
                 {
@@ -22171,7 +22195,7 @@
                   "Name": "SoilWater",
                   "ResourceName": "WaterBalance",
                   "Children": [],
-                  "Enabled": true,
+                  "Enabled": false,
                   "ReadOnly": false
                 },
                 {
@@ -22237,7 +22261,7 @@
                   "Name": "Organic",
                   "ResourceName": null,
                   "Children": [],
-                  "Enabled": true,
+                  "Enabled": false,
                   "ReadOnly": false
                 },
                 {
@@ -22272,7 +22296,7 @@
                   "Name": "Chemical",
                   "ResourceName": null,
                   "Children": [],
-                  "Enabled": true,
+                  "Enabled": false,
                   "ReadOnly": false
                 },
                 {
@@ -22280,7 +22304,7 @@
                   "Name": "Nutrient",
                   "ResourceName": "Nutrient",
                   "Children": [],
-                  "Enabled": true,
+                  "Enabled": false,
                   "ReadOnly": false
                 },
                 {
@@ -22316,7 +22340,7 @@
                   "Name": "NO3",
                   "ResourceName": null,
                   "Children": [],
-                  "Enabled": true,
+                  "Enabled": false,
                   "ReadOnly": false
                 },
                 {
@@ -22352,7 +22376,7 @@
                   "Name": "NH4",
                   "ResourceName": null,
                   "Children": [],
-                  "Enabled": true,
+                  "Enabled": false,
                   "ReadOnly": false
                 },
                 {
@@ -22388,7 +22412,7 @@
                   "Name": "Urea",
                   "ResourceName": null,
                   "Children": [],
-                  "Enabled": true,
+                  "Enabled": false,
                   "ReadOnly": false
                 },
                 {
@@ -22398,11 +22422,11 @@
                   "Name": "Temperature",
                   "ResourceName": null,
                   "Children": [],
-                  "Enabled": true,
+                  "Enabled": false,
                   "ReadOnly": false
                 }
               ],
-              "Enabled": true,
+              "Enabled": false,
               "ReadOnly": false
             },
             {
@@ -22418,7 +22442,7 @@
               "Name": "SurfaceOrganicMatter",
               "ResourceName": "SurfaceOrganicMatter",
               "Children": [],
-              "Enabled": true,
+              "Enabled": false,
               "ReadOnly": false
             },
             {
@@ -22426,7 +22450,7 @@
               "Name": "Wheat",
               "ResourceName": "Wheat",
               "Children": [],
-              "Enabled": true,
+              "Enabled": false,
               "ReadOnly": false
             },
             {
@@ -22509,7 +22533,7 @@
               "Name": "Sow on a fixed date",
               "ResourceName": null,
               "Children": [],
-              "Enabled": true,
+              "Enabled": false,
               "ReadOnly": false
             },
             {
@@ -22564,7 +22588,7 @@
               "Name": "Fertilise at sowing",
               "ResourceName": null,
               "Children": [],
-              "Enabled": true,
+              "Enabled": false,
               "ReadOnly": false
             },
             {
@@ -22608,7 +22632,7 @@
               "Name": "Harvest",
               "ResourceName": null,
               "Children": [],
-              "Enabled": true,
+              "Enabled": false,
               "ReadOnly": false
             },
             {
@@ -22685,7 +22709,7 @@
               "Name": "Reset on sowing",
               "ResourceName": null,
               "Children": [],
-              "Enabled": true,
+              "Enabled": false,
               "ReadOnly": false
             },
             {
@@ -22768,11 +22792,11 @@
               "Name": "Fertilise on event",
               "ResourceName": null,
               "Children": [],
-              "Enabled": true,
+              "Enabled": false,
               "ReadOnly": false
             }
           ],
-          "Enabled": true,
+          "Enabled": false,
           "ReadOnly": false
         },
         {
@@ -22836,7 +22860,7 @@
               "Name": "DUL",
               "ResourceName": null,
               "Children": [],
-              "Enabled": true,
+              "Enabled": false,
               "ReadOnly": false
             },
             {
@@ -22865,7 +22889,7 @@
               "Name": "LL15",
               "ResourceName": null,
               "Children": [],
-              "Enabled": true,
+              "Enabled": false,
               "ReadOnly": false
             },
             {
@@ -22894,11 +22918,11 @@
               "Name": "LL151",
               "ResourceName": null,
               "Children": [],
-              "Enabled": true,
+              "Enabled": false,
               "ReadOnly": false
             }
           ],
-          "Enabled": true,
+          "Enabled": false,
           "ReadOnly": false
         },
         {
@@ -22962,15 +22986,15 @@
               "Name": "DUL",
               "ResourceName": null,
               "Children": [],
-              "Enabled": true,
+              "Enabled": false,
               "ReadOnly": false
             }
           ],
-          "Enabled": true,
+          "Enabled": false,
           "ReadOnly": false
         }
       ],
-      "Enabled": true,
+      "Enabled": false,
       "ReadOnly": false
     },
     {

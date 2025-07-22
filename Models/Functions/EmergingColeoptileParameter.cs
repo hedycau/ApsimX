@@ -20,11 +20,6 @@ namespace Models.Functions
         [Description("Maximum coleoptile length (mm)")]
         public double MaxColeoptileLength { get; set; } = 135;
 
-        /// <summary>Maximum Coleoptile growth rate </summary>
-        [Units("mm/oCd")]
-        [Description("Maximum coleoptile growth rate (mm/oCd)")]
-        public double MaxColeoptileGrowthRate { get; set; } = 1.5;
-
         /// <summary>Coleoptile growth lag phase </summary>
         [Units("oCd")]
         [Description("Coleoptile growth lag phase (oCd)")]

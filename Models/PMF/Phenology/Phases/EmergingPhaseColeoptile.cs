@@ -44,9 +44,13 @@ namespace Models.PMF.Phen
         [Link(Type = LinkType.Child, ByName = true)]
         ColeoptileElongationRateFactor ColeoptileElongationRateFactor = null;
 
-        //Thermal time calculated by soil temperature
+        //Leaf Thermal time calculated by soil temperature
         [Link(Type = LinkType.Child, ByName = true)]
         IFunction SoilThermalTime = null;
+
+        //Copeoptile Thermal time calculated by soil temperature
+        [Link(Type = LinkType.Child, ByName = true)]
+        IFunction ColeoptileSoilThermalTime = null;
 
         //First Leaf Length Rate according to seed weight Zhao et al(2019) JEB
         [Link(Type = LinkType.Child, ByName = true)]
@@ -145,7 +149,8 @@ namespace Models.PMF.Phen
                 {
                     Lagphasecompleteday += 1;
 
-                    ColeoptileGrowthRate = EmergingColeoptileParameter.MaxColeoptileGrowthRate * ColeoptileElongationRateFactor.ColeoptileGrowthRateReductionFactor;
+                    //ColeoptileGrowthRate = EmergingColeoptileParameter.MaxColeoptileGrowthRate * ColeoptileElongationRateFactor.ColeoptileGrowthRateReductionFactor;
+                    ColeoptileGrowthRate = ActualMaxColeoptileLength / MaxGrowthDuration.Value() * ColeoptileElongationRateFactor.ColeoptileGrowthRateReductionFactor;
 
                     if (Lagphasecompleteday == 1)
                     {
@@ -154,7 +159,7 @@ namespace Models.PMF.Phen
                     }
                     else
                     {
-                        DeltaColeoptileLength = SoilThermalTime.Value() * ColeoptileGrowthRate;
+                        DeltaColeoptileLength = ColeoptileSoilThermalTime.Value() * ColeoptileGrowthRate;
                         //ColeoptileElongationRateFactor.SoilTemperatureColeoptileTip / ColeoptileGrowthRate;
                         //Plant.Phenology.thermalTime.Value()
                     }

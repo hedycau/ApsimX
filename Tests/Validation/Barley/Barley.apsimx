@@ -101,7 +101,6 @@
             "[Barley].Leaf.MainStemPopulation",
             "[Barley].SowingData.Cultivar",
             "[Barley].SowingDate.DayOfYear",
-            "[Barley].Leaf.CohortMaxSize",
             "[Clock].StartDate"
           ],
           "EventNames": [

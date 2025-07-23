@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using APSIM.Shared.Documentation;
-using DocumentFormat.OpenXml.Spreadsheet;
+using APSIM.Core;
+using APSIM.Shared.Utilities;
 using Models.Core;
 using Models.Functions;
 using Newtonsoft.Json;
-using System.Diagnostics;
-using Models.PMF;
-using System.Security.Cryptography.Xml;
-using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace Models.PMF.Phen
 {

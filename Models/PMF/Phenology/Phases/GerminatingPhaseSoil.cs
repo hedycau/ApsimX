@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using APSIM.Shared.Documentation;
+using APSIM.Core;
 using APSIM.Shared.Utilities;
 using Models.Core;
 using Models.Functions;
@@ -29,15 +27,15 @@ namespace Models.PMF.Phen
 
         // Germinating parameters
         [Link(Type = LinkType.Child, ByName = true)]
-        GerminatingParameter GerminatingParameter  = null;
+        GerminatingParameter GerminatingParameter = null;
 
         /// <summary>Germinating Water Response and get soil temprature on sowing depth</summary>
         [Link(Type = LinkType.Child, ByName = true)]
         GerminatingWaterResponse GerminatingWaterResponse = null;
 
-        //Thermal time calculated by soil temperature
+        /// <summary>Thermal time calculated by soil temperature</summary>
         [Link(Type = LinkType.Child, ByName = true)]
-        IFunction SoilThermalTime = null;
+        public IFunction SoilThermalTime = null;
 
         //2. Public properties
         //-----------------------------------------------------------------------------------------------------------------
@@ -90,10 +88,10 @@ namespace Models.PMF.Phen
             if (AccumTTthisPhase >= GerminatingParameter.DormancyPhase)
             {
                 Dormancyphasecompleteday += 1;
-                
+
                 if (Dormancyphasecompleteday == 1)
                 {
-                    AccumTargetTT = (AccumTTthisPhase - GerminatingParameter.DormancyPhase + SoilThermalTime.Value() * GerminatingWaterResponse.GerminationDurationFW) ;
+                    AccumTargetTT = (AccumTTthisPhase - GerminatingParameter.DormancyPhase + SoilThermalTime.Value() * GerminatingWaterResponse.GerminationDurationFW);
                     //Plant.Phenology.thermalTime.Value()
                 }
                 else

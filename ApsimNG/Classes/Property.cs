@@ -14,6 +14,9 @@ using Models.Management;
 using Models.PMF;
 using Models.Storage;
 using Models.Surface;
+using Models.Soils;
+
+using Models.Utilities;
 namespace UserInterface.Classes
 {
     public enum PropertyType
@@ -138,7 +141,7 @@ namespace UserInterface.Classes
             else if (Value != null && typeof(IModel).IsAssignableFrom(Value.GetType()))
                 Value = ((IModel)Value).Name;
             else if (metadata.PropertyType.IsEnum)
-                Value = VariableProperty.GetEnumDescription((Enum)Enum.Parse(metadata.PropertyType, Value?.ToString()));
+                Value = AttributeUtilities.GetEnumDescription((Enum)Enum.Parse(metadata.PropertyType, Value?.ToString()));
             else if (metadata.PropertyType != typeof(bool) && metadata.PropertyType != typeof(System.Drawing.Color))
                 Value = ReflectionUtilities.ObjectToString(Value, CultureInfo.CurrentCulture);
 
@@ -224,7 +227,7 @@ namespace UserInterface.Classes
                     {
                         // Enums use dropdown
                         DropDownOptions = Enum.GetValues(metadata.PropertyType).Cast<Enum>()
-                                      .Select(e => VariableProperty.GetEnumDescription(e))
+                                      .Select(e => AttributeUtilities.GetEnumDescription(e))
                                       .ToArray();
                         DisplayMethod = PropertyType.DropDown;
                     }
@@ -408,6 +411,20 @@ namespace UserInterface.Classes
                     var plantModels = model.FindAllInScope<Plant>();
                     if (plantModels != null)
                         DropDownOptions = plantModels.Select(plant => plant.Name).ToArray();
+                    break;
+                case DisplayType.SoilCrop:
+                    DisplayMethod = PropertyType.DropDown;
+                    Water water = model.FindInScope<Water>();
+                    if (water != null)
+                        DropDownOptions = water.AllowedRelativeTo.ToArray();
+                    break;
+                case DisplayType.StrumTreeTypes:
+                    DisplayMethod = PropertyType.DropDown;
+                    DropDownOptions = new string[2] { "Ever green", "Deciduous" };
+                    break;
+                case DisplayType.CanopyTypes:
+                    DisplayMethod = PropertyType.DropDown;
+                    DropDownOptions = new string[4] { "BroadAcre", "TreeRow", "CropRow", "VineRow" };
                     break;
 
                 // Should never happen - presenter should handle this(?)

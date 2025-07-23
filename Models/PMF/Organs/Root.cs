@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using APSIM.Core;
 using APSIM.Numerics;
 using APSIM.Shared.Utilities;
 using Models.Core;
@@ -170,6 +171,19 @@ namespace Models.PMF.Organs
 
         /// <summary>Link to the soilCrop</summary>
         public SoilCrop SoilCrop {get; private set;} = null;
+
+        /// <summary>Water supplied by root network to soil arbitrator for this plant instance</summary>
+        public PlantWaterOrNDelta WaterUptakeSupply { get; set; }
+
+        /// <summary>Nitrogen supplied by the root network to the soil arbitrator for this plant instance</summary>
+        public PlantWaterOrNDelta NitrogenUptakeSupply { get; set; }
+
+        /// <summary>The water uptake allocated to the plant instance by the soil arbitrator</summary>
+        public PlantWaterOrNDelta WaterTakenUp { get; set; }
+
+        /// <summary>The Nitrogen uptake allocated to the plant instance by the soil arbitrator</summary>
+        public PlantWaterOrNDelta NitrogenTakenUp { get; set; }
+
 
         /// <summary>The DM supply for retranslocation</summary>
         private double dmRetranslocationSupply = 0.0;
@@ -570,6 +584,8 @@ namespace Models.PMF.Organs
                     zone.NO3.SetKgHa(SoluteSetterType.Plant, MathUtilities.Subtract(zone.NO3.kgha, thisZone.NO3N));
                     zone.NH4.SetKgHa(SoluteSetterType.Plant, MathUtilities.Subtract(zone.NH4.kgha, thisZone.NH4N));
 
+                    zone.NO3Uptake = thisZone.NO3N;
+                    zone.NH4Uptake = thisZone.NH4N;
                     zone.NitUptake = MathUtilities.Multiply_Value(MathUtilities.Add(thisZone.NO3N, thisZone.NH4N), -1);
                 }
             }

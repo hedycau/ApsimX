@@ -1,11 +1,12 @@
-﻿using System;
-using APSIM.Core;
+﻿using APSIM.Core;
 using APSIM.Shared.Utilities;
 using Models.Core;
 using Models.Functions;
 using Models.Interfaces;
+using Models.PMF.Interfaces;
 using Models.Soils;
 using Newtonsoft.Json;
+using System;
 
 namespace Models.PMF.Phen
 {
@@ -24,6 +25,11 @@ namespace Models.PMF.Phen
         [Link] private ISoilTemperature soilTemperature = null;
         [Link] private IPhysical SoilPhysical = null;
         [Link] Plant Plant = null;
+        [Link]
+        private Phenology phenology = null;
+
+        [Link]
+        private IClock clock = null;
 
         // Germinating parameters
         [Link(Type = LinkType.Child, ByName = true)]
@@ -72,6 +78,11 @@ namespace Models.PMF.Phen
         ///<summary>Soil temperature of the layer where the seed is</summary>
         public double SoilTemperatureSeed { get; set; }
 
+        /// <summary>
+        /// Date for germination to occur.  null by default so model is used
+        /// </summary>
+        [JsonIgnore]
+        public string GerminationDate { get; set; }
 
         //3. Public method
         //-----------------------------------------------------------------------------------------------------------------
@@ -104,15 +115,18 @@ namespace Models.PMF.Phen
 
             AccumTTthisPhase = AccumTTthisPhase + SoilThermalTime.Value() * GerminatingWaterResponse.GerminationDurationFW;//Plant.Phenology.thermalTime.Value()
 
-            if (AccumTargetTT >= GerminatingParameter.GerminationTarget)
+            if (GerminationDate != null)
             {
-                proceedToNextPhase = true;
-                doGermination(ref proceedToNextPhase, ref propOfDayToUse);
+                if (DateUtilities.DayMonthIsEqual(GerminationDate, clock.Today))
+                {
+                    doGermination(ref proceedToNextPhase, ref propOfDayToUse);
+                }
             }
-            else
-                proceedToNextPhase = false;
-
-            return proceedToNextPhase;
+            else if (!phenology.OnStartDayOf("Sowing") && AccumTargetTT >= GerminatingParameter.GerminationTarget)
+            {
+                doGermination(ref proceedToNextPhase, ref propOfDayToUse);
+            }            
+                return proceedToNextPhase;
         }
 
         /// <summary>Reset phase</summary>
@@ -121,6 +135,7 @@ namespace Models.PMF.Phen
             AccumTTthisPhase = 0;
             AccumTargetTT = 0;
             Dormancyphasecompleteday = 0;
+            GerminationDate = null;
         }
         // 4. Private methods
         //-----------------------------------------------------------------------------------------------------------------

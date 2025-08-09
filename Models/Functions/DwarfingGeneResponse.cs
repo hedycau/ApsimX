@@ -25,6 +25,8 @@ namespace Models.Functions
             ///<summary>GAS dwarfing gene</summary>
             Rht13,
             ///<summary>GAI dwarfing gene</summary>
+            Rht18,
+            ///<summary>GAI dwarfing gene</summary>
             Rht1,
             ///<summary>GAI dwarfing gene</summary>
             Rht2,
@@ -38,6 +40,9 @@ namespace Models.Functions
 
         ///<summary>The reduction factor on coleoptile length</summary>
         public double ColeoptileReductionFactor { get; set; }
+
+        ///<summary>The impact factor on coleoptile elongation rate</summary>
+        public double ColeoptileElongationRate { get; set; }
 
         ///<summary>The reduction factor on leaf size</summary>
         public double LeafSizeReductionFactor { get; set; }
@@ -55,6 +60,18 @@ namespace Models.Functions
                 DwarfingGenesOption.Rht1 => 0.75,
                 DwarfingGenesOption.Rht2 => 0.75,
                 DwarfingGenesOption.Rht1_Rht2 => 0.5,
+                _ => throw new ArgumentException($"Unsupported genetic type: {DwarfingGeneType}")
+            };
+
+            ColeoptileElongationRate = DwarfingGeneType switch
+            {
+                DwarfingGenesOption.rht => 1.56,
+                DwarfingGenesOption.Rht8 => 1.63,
+                DwarfingGenesOption.Rht13 => 1.63,
+                DwarfingGenesOption.Rht18 => 1.53,
+                DwarfingGenesOption.Rht1 => 1.07,
+                DwarfingGenesOption.Rht2 => 1.05,
+                DwarfingGenesOption.Rht1_Rht2 => 0.908,
                 _ => throw new ArgumentException($"Unsupported genetic type: {DwarfingGeneType}")
             };
 

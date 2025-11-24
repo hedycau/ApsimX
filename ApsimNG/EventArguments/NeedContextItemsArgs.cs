@@ -251,6 +251,12 @@
             object node = GetNodeFromPath(relativeTo, objectName);
             if (node == null)
                 node = relativeTo.Node.Get(objectName);
+            if (node == null)
+            {
+                node = relativeTo.Node.GetObject(objectName);
+                if (node is VariableComposite variableComposite)
+                    node = variableComposite.DataType;
+            }
             if (node != null)
             {
                 contextItems = ExamineObjectForContextItems(node, properties, methods, publishedEvents, subscribedEvents);
@@ -305,21 +311,23 @@
                 // search through all models, not just those in scope.
                 if (node == null && Folder.IsUnderReplacementsFolder(relativeTo) != null)
                 {
-                    node = relativeTo.FindAncestor<Simulations>().FindAllDescendants().FirstOrDefault(child => child.Name == modelName);
+                    var sims = relativeTo.Node.FindParent<Simulations>(recurse: true);
+                    if (sims != null)
+                        node = sims.Node.FindChildren<IModel>(recurse: true).FirstOrDefault(child => child.Name == modelName);
 
                     // If we still failed, try a lookup on type name.
                     if (node == null)
-                        node = relativeTo.FindAncestor<Simulations>().FindAllDescendants().FirstOrDefault(x => x.GetType().Name == modelName);
+                        node = sims.Node.FindChildren<IModel>(recurse: true).FirstOrDefault(x => x.GetType().Name == modelName);
                 }
 
-                if (node == null && relativeTo.FindAncestor<Factors>() != null)
+                if (node == null && relativeTo.Node.FindParent<Factors>(recurse: true) != null)
                 {
-                    relativeTo = relativeTo.FindAncestor<Experiment>();
+                    relativeTo = relativeTo.Node.FindParent<Experiment>(recurse: true);
                     if (relativeTo != null)
                     {
                         node = relativeTo.Node.FindInScope(modelName);
                         if (node == null)
-                            node = relativeTo.FindAllDescendants().FirstOrDefault(x => x.GetType().Name == modelName);
+                            node = relativeTo.Node.FindChildren<IModel>(recurse: true).FirstOrDefault(x => x.GetType().Name == modelName);
                     }
                     if (node == null)
                         return null;

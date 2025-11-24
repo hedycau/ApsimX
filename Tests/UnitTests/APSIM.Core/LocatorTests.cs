@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using APSIM.Shared.Documentation.Extensions;
 
 namespace APSIM.Core.Tests
 {
@@ -470,7 +471,7 @@ namespace APSIM.Core.Tests
 
             //check that the child still exists as well
             Model cnrfChild = null;
-            foreach(Model child in nutrient.Children)
+            foreach (Model child in nutrient.Children)
                 if (child.Name == "CNRF")
                     cnrfChild = child;
             if (cnrfChild == null)
@@ -587,6 +588,39 @@ namespace APSIM.Core.Tests
         }
 
         /// <summary>
+        /// Specific test for GetAllObjects
+        /// </summary>
+        [Test]
+        public void GetAllObjectsTests()
+        {
+            Simulation simulation = new()
+            {
+                Children =
+                [
+                    new Zone()
+                    {
+                        Children = [
+                            new Clock() { StartDate = new DateTime(2000, 1, 1) }
+                        ]
+                    },
+                    new Zone()
+                    {
+                        Children = [
+                            new Clock() { StartDate = new DateTime(2000, 2, 2) }
+                        ]
+                    }
+                ]
+            };
+            Node.Create(simulation);
+
+            //should return the IVariable instead of the value of a property
+            var instances = simulation.Node.GetAllObjects("[Clock].StartDate").ToArray();
+            Assert.That(instances.Count, Is.EqualTo(2));
+            Assert.That(instances[0].Value, Is.EqualTo(new DateTime(2000, 1, 1)));
+            Assert.That(instances[1].Value, Is.EqualTo(new DateTime(2000, 2, 2)));
+        }
+
+        /// <summary>
         /// Specific test for GetObjectProperties
         /// Is used by report to get only property variables
         /// </summary>
@@ -645,6 +679,27 @@ namespace APSIM.Core.Tests
             DateTime dt = new DateTime(2020, 1, 1);
             loc.Set("[ModelD].D3", new Clock() { StartDate = dt });
             Assert.That((sims.Children[0].Children[3] as ModelD).D3.StartDate, Is.EqualTo(dt));
+        }
+
+        /// <summary>
+        /// Specific test for Set
+        /// Sets a value of a property when the property is null before the set.
+        /// </summary>
+        [Test]
+        public void SetTestOnMinimalSimulation()
+        {
+            var sim = new Simulation()
+            {
+                Children = [
+                    new Models.Climate.Weather()
+                ]
+            };
+            Node.Create(sim);
+            sim.Node.Set("[Weather].FileName", "dummy.met");
+
+            //set a read only property
+            var weather = sim.Children.First() as Models.Climate.Weather;
+            Assert.That(weather.FileName, Is.EqualTo("dummy.met"));
         }
 
         /// <summary>
@@ -835,7 +890,7 @@ namespace APSIM.Core.Tests
 
             //Empty path should give back no bits or error
             inputs.Add("");
-            results.Add(new string[] {});
+            results.Add(new string[] { });
 
             //a single space path should give an error
             inputs.Add(" ");
@@ -925,6 +980,34 @@ namespace APSIM.Core.Tests
             foreach (PropertyInfo prop in properties)
                 if (names.Contains(prop.Name) == false)
                     Assert.Fail($"{prop.Name} is not tested by an individual unit test.");
+        }
+
+        /// <summary>
+        /// Test to make sure the type of an object can be passed to find a child, even if the child has a different name to it's type.
+        /// </summary>
+        [Test]
+        public void GetChildModelByTypeInsteadOfName()
+        {
+            Simulations sims = MakeTestSimulation();
+            IStructure loc = sims.Node;
+            loc.Set("[Simulation].ModelF.Name", "NotModelF");
+
+            //Should find ModelF even though it's not called ModelF
+            Assert.That(loc.Get("[Simulation].ModelF"), Is.Not.Null);
+        }
+
+        /// <summary>
+        /// Test to make sure the type of an object can be found even if it has square brackets in it's name
+        /// </summary>
+        [Test]
+        public void GetChildModelThatHasSquareBracketsInName()
+        {
+            Simulations sims = MakeTestSimulation();
+            IStructure loc = sims.Node;
+            loc.Set("[Simulation].ModelF.Name", "ModelFWith[1]");
+
+            //Should find ModelF even though it's not called ModelF
+            Assert.That(loc.Get("[Simulation].ModelFWith[1]"), Is.Not.Null);
         }
     }
 }

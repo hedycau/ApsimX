@@ -164,16 +164,16 @@ namespace Models.PMF.Phen
                     DeltaLeafLength = FirstLeafGrowthRate * ColeoptileElongationRateFactor.ColeoptileGrowthRateReductionFactor * SoilThermalTime.Value() /2; //assume the leaf is folded
                 }
                 TotalShootLength = ColeoptileLength + DeltaLeafLength;
-                TotalShootLength = Math.Min(Math.Min(TotalShootLength, Plant.SowingData.Depth), ActualMaxLength);
-                ColeoptileLength = Math.Min(Math.Min(ColeoptileLength, Plant.SowingData.Depth), ActualMaxColeoptileLength);
+                TotalShootLength = Math.Min(TotalShootLength, Plant.SowingData.Depth); //Math.Min(Math.Min(TotalShootLength, Plant.SowingData.Depth), ActualMaxLength);
+                ColeoptileLength = Math.Min(ColeoptileLength, Plant.SowingData.Depth); //Math.Min(Math.Min(ColeoptileLength, Plant.SowingData.Depth), ActualMaxColeoptileLength);
             }
 
 
             AccumColeoptileTTthisPhase = AccumColeoptileTTthisPhase + ColeoptileElongationRateFactor.SoilTemperatureColeoptileTip;//Plant.Phenology.thermalTime.Value()
             AccumLeafTTthisPhase = AccumLeafTTthisPhase + SoilThermalTime.Value();
 
-            if (Plant.SowingData.Depth <= ActualMaxLength)
-             {
+            //if (Plant.SowingData.Depth <= ActualMaxLength)
+             //{
                 if (TotalShootLength >= Plant.SowingData.Depth)
                 {
                     proceedToNextPhase = true;
@@ -184,18 +184,18 @@ namespace Models.PMF.Phen
                 }
                 else
                     proceedToNextPhase = false;
-             }
+             //}
             
-            if (Plant.SowingData.Depth > ActualMaxLength)
-            {
-                if (AccumLeafTTthisPhase >= 2 * MaxGrowthDuration.Value())
-                {
-                    proceedToNextPhase = true;
-                }
-                else
-                    proceedToNextPhase = false;
+            //if (Plant.SowingData.Depth > ActualMaxLength)
+            //{
+            //    if (AccumLeafTTthisPhase >= 2 * MaxGrowthDuration.Value())
+             //   {
+             //       proceedToNextPhase = true;
+              //  }
+               // else
+                //    proceedToNextPhase = false;
 
-            }
+            //}
             return proceedToNextPhase;
         }
         /// <summary>Reset phase</summary>

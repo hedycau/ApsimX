@@ -1,19 +1,15 @@
-﻿
+﻿using System;
+using System.IO;
+using System.Net.NetworkInformation;
+using APSIM.Shared.Utilities;
+using UserInterface.Interfaces;
+using Models.CLEM;
+using Models.CLEM.Interfaces;
+using Models.Core;
+using UserInterface.Views;
+
 namespace UserInterface.Presenters
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Net.NetworkInformation;
-    using System.Reflection;
-    using System.Text;
-    using APSIM.Shared.Utilities;
-    using global::UserInterface.Interfaces;
-    using Models.CLEM;
-    using Models.CLEM.Interfaces;
-    using Models.Core;
-    using Models.Core.ApsimFile;
-    using Views;
 
     /// <summary>
     /// Presenter to provide HTML description summary for CLEM models
@@ -21,7 +17,7 @@ namespace UserInterface.Presenters
     public class CLEMSummaryPresenter : IPresenter, IRefreshPresenter
     {
         private Model model;
-        private IMarkdownView genericView;
+        private MarkdownView genericView;
         private ExplorerPresenter explorer;
         private string htmlFilePath = "";
         private string targetFilePath = "";
@@ -35,7 +31,8 @@ namespace UserInterface.Presenters
         public void Attach(object model, object view, ExplorerPresenter explorerPresenter)
         {
             this.model = model as Model;
-            this.genericView = view as IMarkdownView;
+            this.genericView = view as MarkdownView;
+            
             explorer = explorerPresenter;
 
             // save summary to disk when component is first pressed regardless of user selecting summary tab as now goes to html in browser

@@ -1,11 +1,13 @@
-﻿namespace UserInterface.Views
+﻿using UserInterface.Interfaces;
+using Gtk;
+using System;
+using System.IO;
+using System.Reflection;
+using Utility;
+using System.Linq;
+
+namespace UserInterface.Views
 {
-    using global::UserInterface.Interfaces;
-    using Gtk;
-    using System;
-    using System.IO;
-    using System.Reflection;
-    using Utility;
 
     public class ViewBase : IDisposable
     {
@@ -169,10 +171,11 @@
         /// Set the GLADE resource to use.
         /// </summary>
         /// <param name="gladeResourceName">The GLADE resource name.</param>
-        public void SetGladeResource(string gladeResourceName)
+        public Builder SetGladeResource(string gladeResourceName)
         {
             builder = GetBuilderFromResource(gladeResourceName);
             SetMainWidget();
+            return builder;
         }
 
         /// <summary>
@@ -184,7 +187,15 @@
         public T GetControl<T>(string controlName) where T : ViewBase, new()
         {
             T control = new T();
-            control.Initialise(this, builder.GetObject(controlName));
+            if (builder != null)
+                control.Initialise(this, builder.GetObject(controlName));
+            else
+            {
+                Widget widget = mainWidget.Descendants().FirstOrDefault(w => w.Name == controlName);
+                if (widget != null)
+                    control.Initialise(this, widget);
+            }
+                
             return control;
         }
 

@@ -1,9 +1,10 @@
-﻿using System;
-using APSIM.Core;
+﻿using APSIM.Core;
 using APSIM.Shared.Utilities;
 using Models.Core;
 using Models.Functions;
+using Models.GrazPlan.Organs;
 using Newtonsoft.Json;
+using System;
 
 namespace Models.PMF.Phen
 {
@@ -53,8 +54,8 @@ namespace Models.PMF.Phen
         //First Leaf Width Rate according to seed weight Zhao et al(2019) JEB
         [Link(Type = LinkType.Child, ByName = true)]
         IFunction FirstLeafWidthRate = null;
-        
 
+        
         //2. Public properties
         //-----------------------------------------------------------------------------------------------------------------
 
@@ -228,11 +229,12 @@ namespace Models.PMF.Phen
         private void OnDoDailyInitialisation(object sender, EventArgs e)
         {
             if (Plant.Phenology.CurrentStageName == "Emergence")
-            {
+                {
+                
                 if (ColeoptileLength < Plant.SowingData.Depth) 
                 { 
                 double belta = Plant.SowingData.Depth / ColeoptileLength;
-
+     
                 if (belta > 2)
                 {
                     probEmergence = 0;
@@ -245,10 +247,27 @@ namespace Models.PMF.Phen
                 {
                     probEmergence = (2 - belta) / (2 - 0.6);
                 }
-                Plant.Population = Math.Max(1, Plant.SowingData.Population * probEmergence);
-                Plant.SowingData.Population = Math.Max(1, Plant.SowingData.Population * probEmergence);
+                Plant.Population = Math.Max(0, Plant.SowingData.Population * probEmergence);
+                Plant.SowingData.Population = Math.Max(0, Plant.SowingData.Population * probEmergence);
+
+
+                   // Plant.Leaf.LAI = Plant.Leaf.LAI * probEmergence;
+               
+
+
+
+                    //var leaf = Plant.Children?.Find(child => child is Models.PMF.Organs.Leaf) as Models.PMF.Organs.Leaf;
+                    //leaf?.Reset();
+
+
+                    //var stem = Plant.Children?.Find(child => child.GetType().FullName == "Models.PMF.Organs.Stem");
+                    //(stem as dynamic)?.Reset(); // Call Reset() if available
+
                 }
             }
         }
+
+     
     }
 }
+

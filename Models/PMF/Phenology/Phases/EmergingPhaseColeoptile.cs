@@ -245,8 +245,8 @@ namespace Models.PMF.Phen
                 {
                     probEmergence = (2 - belta) / (2 - 0.6);
                 }
-                Plant.Population = Plant.SowingData.Population * probEmergence;
-                Plant.SowingData.Population = Plant.SowingData.Population * probEmergence;
+                Plant.Population = Math.Max(1, Plant.SowingData.Population * probEmergence);
+                Plant.SowingData.Population = Math.Max(1, Plant.SowingData.Population * probEmergence);
                 }
             }
         }

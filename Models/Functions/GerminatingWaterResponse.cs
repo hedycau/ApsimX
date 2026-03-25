@@ -52,7 +52,7 @@ namespace Models.Functions
         private void OnStartOfDay(object sender, EventArgs e)
         {
             int i = SoilUtilities.LayerIndexOfDepth(SoilPhysical.Thickness, Plant.SowingData.Depth);
-            // Calculate soil water content when Water Potential -0.5, assuming DUL is WP = 0, LL15 is WP = 1.5
+            // Calculate soil water content when Water Potential -0.5, assuming DUL is WP = 0, LL15 is WP = -1.5
             WP1  = SoilPhysical.LL15mm[i] + (SoilPhysical.DULmm[i] - SoilPhysical.LL15mm[i]) * 2/3;
             FWP1 = WaterResponseT1.Value();
             FW15  = Math.Max(0, FWP1 * (SoilPhysical.LL15mm[i] -  WaterResponseT0.Value()) / (WP1 - WaterResponseT0.Value()));
@@ -60,7 +60,7 @@ namespace Models.Functions
             if (WaterBalance.SWmm[i] <= SoilPhysical.LL15mm[i])
              {
                 //GerminationDurationFW = 0.5 * WaterBalance.SWmm[i] / SoilPhysical.LL15mm[i];
-                GerminationDurationFW = Math.Max(0, FW15 * WaterBalance.SWmm[i] / SoilPhysical.LL15mm[i]);
+                GerminationDurationFW = 0; // Math.Max(0, FW15 * WaterBalance.SWmm[i] / SoilPhysical.LL15mm[i]);
              }
             else if (WaterBalance.SWmm[i] >= SoilPhysical.DULmm[i])
              {

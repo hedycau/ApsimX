@@ -56,7 +56,7 @@ namespace Models.Functions
         private void OnStartOfDay(object sender, EventArgs e)
         {
             ColeoptileTipDepth = Plant.SowingData.Depth - EmergingPhaseColeoptile.ColeoptileLength;
-            ColeoptileTipDepth = Math.Max(ColeoptileTipDepth, 0);
+            ColeoptileTipDepth = Math.Max(ColeoptileTipDepth, 0.00001);
 
             if (ColeoptileTipDepth > 0)
             {

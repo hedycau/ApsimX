@@ -60,8 +60,10 @@ namespace Models.Functions
             if (WaterBalance.SWmm[i] <= SoilPhysical.LL15mm[i])
              {
                 //GerminationDurationFW = 0.5 * WaterBalance.SWmm[i] / SoilPhysical.LL15mm[i];
-                GerminationDurationFW = 0; // Math.Max(0, FW15 * WaterBalance.SWmm[i] / SoilPhysical.LL15mm[i]);
-             }
+                //GerminationDurationFW = 0; //base water for germination is LL15, so if soil water is below LL15, germination duration is not reduced but stopped.
+                //GerminationDurationFW = Math.Max(0, FW15 * WaterBalance.SWmm[i] / SoilPhysical.LL15mm[i]); base water determined by temperature, less than LL15 could be 0.
+                GerminationDurationFW = Math.Max(0, FW15 * (WaterBalance.SWmm[i] - SoilPhysical.LL15mm[i] * 2/3) / (SoilPhysical.LL15mm[i]  - SoilPhysical.LL15mm[i] * 2/3));// base water determined by temperature, minimums is 2/3 of LL15
+            }
             else if (WaterBalance.SWmm[i] >= SoilPhysical.DULmm[i])
              {
                GerminationDurationFW = 1;
@@ -75,7 +77,7 @@ namespace Models.Functions
             {
                GerminationDurationFW = (FWP1 - FW15) * (WaterBalance.SWmm[i] - SoilPhysical.LL15mm[i]) / (WP1- SoilPhysical.LL15mm[i]) + FW15;
              }
-        }
+        } 
    //     /// <summary>
     //    /// Returns the the value of germination duratin FW.
      //   /// </summary>

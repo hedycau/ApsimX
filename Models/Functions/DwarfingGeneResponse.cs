@@ -65,13 +65,13 @@ namespace Models.Functions
 
             ColeoptileElongationRate = DwarfingGeneType switch
             {
-                DwarfingGenesOption.rht => 1.248 ,// 1.56,
-                DwarfingGenesOption.Rht8 => 1.304, //1.63,
-                DwarfingGenesOption.Rht13 => 1.304, //1.63,
-                DwarfingGenesOption.Rht18 => 1.224, //1.53,
-                DwarfingGenesOption.Rht1 => 0.856, //1.07,
-                DwarfingGenesOption.Rht2 => 0.84, //1.05,
-                DwarfingGenesOption.Rht1_Rht2 => 0.7264, //0.908,
+                DwarfingGenesOption.rht => 0.78, //1.248 ,// 1.56,
+                DwarfingGenesOption.Rht8 => 0.815, //1.304, //1.63,
+                DwarfingGenesOption.Rht13 => 0.815, //1.304, //1.63,
+                DwarfingGenesOption.Rht18 => 0.765, //1.224, //1.53,
+                DwarfingGenesOption.Rht1 => 0.535, //0.856, //1.07,
+                DwarfingGenesOption.Rht2 => 0.525,//0.84, //1.05,
+                DwarfingGenesOption.Rht1_Rht2 => 0.454, //0.7264, //0.908,
                 _ => throw new ArgumentException($"Unsupported genetic type: {DwarfingGeneType}")
             };
 

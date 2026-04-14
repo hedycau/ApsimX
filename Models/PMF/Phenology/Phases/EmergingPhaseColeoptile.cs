@@ -125,6 +125,9 @@ namespace Models.PMF.Phen
         [Units("")]
         public double FirstLeafWidthRateValue { get; set; }
 
+        /// <summary>Maximum growth duration </summary>
+        [Units("oCd")]
+        public double MaxGrowthDurationValue { get; set; }
 
         //3. Public method
         //-----------------------------------------------------------------------------------------------------------------
@@ -137,10 +140,11 @@ namespace Models.PMF.Phen
             ActualMaxLength = EmergingColeoptileParameter.MaxColeoptileLength * DwarfingGeneResponse.ColeoptileReductionFactor + EmergingColeoptileParameter.FirstLeafLength/2;
             ActualMaxColeoptileLength = EmergingColeoptileParameter.MaxColeoptileLength * DwarfingGeneResponse.ColeoptileReductionFactor;
             FirstLeafGrowthRate = EmergingColeoptileParameter.FirstLeafLength * FirstLeafLengthRate.Value()/ MaxGrowthDuration.Value();
+            MaxGrowthDurationValue = MaxGrowthDuration.Value() * 2;
 
             if (AccumColeoptileTTthisPhase >= EmergingColeoptileParameter.ColeoptileLagphase)                
             {
-                if (AccumLeafTTthisPhase <= MaxGrowthDuration.Value())
+                if (AccumLeafTTthisPhase <= MaxGrowthDurationValue)
                 {
                     Lagphasecompleteday += 1;
 
@@ -160,7 +164,7 @@ namespace Models.PMF.Phen
                     }
                     ColeoptileLength = ColeoptileLength + DeltaColeoptileLength;
                     
-                } else if (AccumLeafTTthisPhase > MaxGrowthDuration.Value())
+                } else if (AccumLeafTTthisPhase > MaxGrowthDurationValue)
                 {
                     DeltaLeafLength = FirstLeafGrowthRate * ColeoptileElongationRateFactor.ColeoptileGrowthRateReductionFactor * SoilThermalTime.Value() /2; //assume the leaf is folded
                 }
@@ -179,7 +183,7 @@ namespace Models.PMF.Phen
                 {
                     proceedToNextPhase = true;
                 }
-                else if (AccumLeafTTthisPhase >= 2 * MaxGrowthDuration.Value())
+                else if (AccumLeafTTthisPhase >= (MaxGrowthDurationValue + MaxGrowthDuration.Value()))
                 {
                     proceedToNextPhase = true;
                 }
@@ -232,8 +236,8 @@ namespace Models.PMF.Phen
                 {
                 
                 if (ColeoptileLength < Plant.SowingData.Depth) 
-                { 
-                double belta = Plant.SowingData.Depth / ColeoptileLength;
+                {
+                    double belta = Plant.SowingData.Depth / ColeoptileLength;
      
                 if (belta > 2)
                 {

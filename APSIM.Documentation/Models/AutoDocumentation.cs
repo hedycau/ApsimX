@@ -64,7 +64,7 @@ namespace APSIM.Documentation.Models
                 {typeof(LinearInterpolationFunction), typeof(DocLinearInterpolationFunction)},
                 {typeof(HeightFunction), typeof(DocFunction)},
                 {typeof(BudNumberFunction), typeof(DocFunction)},
-                {typeof(ZadokPMFWheat), typeof(DocZadokPMFWheat)},
+                {typeof(Zadok), typeof(DocZadok)},
                 {typeof(XYPairs), typeof(DocXYPairs)},
                 {typeof(VernalisationPhase), typeof(DocPhase)},
                 {typeof(SubDailyInterpolation), typeof(DocSubDailyInterpolation)},
@@ -111,7 +111,8 @@ namespace APSIM.Documentation.Models
                 {typeof(Alias), typeof(DocAlias)},
                 {typeof(Simulations), typeof(DocSimulations)},
                 {typeof(M.Graph), typeof(DocGraph)},
-                {typeof(Nutrient), typeof(DocNutrient)}
+                {typeof(Nutrient), typeof(DocNutrient)},
+                {typeof(Group), typeof(DocGenericWithChildren)},
             };
             return documentMap;
         }
